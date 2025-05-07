@@ -1,14 +1,49 @@
+version: '3.8'
+
 services:
+#  main-service:
+#    build:
+#      context: ./main-service
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/mainservice
+#      SPRING_DATASOURCE_USERNAME: yourUser
+#      SPRING_DATASOURCE_PASSWORD: yourPassword
+#    depends_on:
+#      - stats-server
+#      - stats-db
+
   stats-server:
+    build:
+      context: ./stats/stats-server
     ports:
-      - "9090:9090"
+      - "9090:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/statsdb
+      SPRING_DATASOURCE_USERNAME: yourUser
+      SPRING_DATASOURCE_PASSWORD: yourPassword
+    depends_on:
+      - stats-db
 
   stats-db:
     image: postgres:16.1
-
-  ewm-service:
+    environment:
+      POSTGRES_DB: statsdb
+      POSTGRES_USER: yourUser
+      POSTGRES_PASSWORD: yourPassword
     ports:
-      - "8080:8080"
+      - "5432:5432"
 
-  ewm-db:
+  main-db:
     image: postgres:16.1
+    environment:
+      POSTGRES_DB: mainservice
+      POSTGRES_USER: yourUser
+      POSTGRES_PASSWORD: yourPassword
+    ports:
+      - "5433:5432"
+
+networks:
+  default:
+    driver: bridge
