@@ -1,49 +1,27 @@
-version: '3.8'
-
 services:
-#  main-service:
-#    build:
-#      context: ./main-service
-#    ports:
-#      - "8080:8080"
-#    environment:
-#      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/mainservice
-#      SPRING_DATASOURCE_USERNAME: yourUser
-#      SPRING_DATASOURCE_PASSWORD: yourPassword
-#    depends_on:
-#      - stats-server
-#      - stats-db
-
-  stats-server:
-    build:
-      context: ./stats/stats-server
-    ports:
-      - "9090:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/statsdb
-      SPRING_DATASOURCE_USERNAME: yourUser
-      SPRING_DATASOURCE_PASSWORD: yourPassword
-    depends_on:
-      - stats-db
-
   stats-db:
     image: postgres:16.1
-    environment:
-      POSTGRES_DB: statsdb
-      POSTGRES_USER: yourUser
-      POSTGRES_PASSWORD: yourPassword
+    container_name: postgres-stats-db
     ports:
-      - "5432:5432"
-
-  main-db:
-    image: postgres:16.1
+      - "6541:5432"
     environment:
-      POSTGRES_DB: mainservice
-      POSTGRES_USER: yourUser
-      POSTGRES_PASSWORD: yourPassword
+      - POSTGRES_PASSWORD=statistics
+      - POSTGRES_USER=statistics
+      - POSTGRES_DB=statistics
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+  stats-server:
+    build: statistics/server
+    image: ewm-stats
+    container_name: ewm-stats
     ports:
-      - "5433:5432"
-
-networks:
-  default:
-    driver: bridge
+      - "9090:9090"
+    depends_on:
+      - stats-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/statistics
+      - SPRING_DATASOURCE_USERNAME=statistics
+      - SPRING_DATASOURCE_PASSWORD=statistics

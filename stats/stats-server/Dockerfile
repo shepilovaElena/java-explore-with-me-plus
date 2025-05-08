@@ -1,5 +1,5 @@
-FROM openjdk:21-jdk-slim
-WORKDIR /app
-COPY target/stats-server-1.0-SNAPSHOT.jar /app/stats-server.jar
-EXPOSE 8080
-CMD ["java", "-jar", "stats-server.jar"]
+FROM eclipse-temurin:21-jre-jammy
+VOLUME /tmp
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar /app.jar"]
