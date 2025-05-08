@@ -1,10 +1,8 @@
 package ru.practicum;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
 
