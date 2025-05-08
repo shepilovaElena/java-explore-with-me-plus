@@ -25,3 +25,25 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/statistics
       - SPRING_DATASOURCE_USERNAME=statistics
       - SPRING_DATASOURCE_PASSWORD=statistics
+  ewm-service:
+    build: main-service/main-server
+    image: ewm-service
+    container_name: ewm-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ewm-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5433/mainservice
+      - SPRING_DATASOURCE_USERNAME=mainservice
+      - SPRING_DATASOURCE_PASSWORD=mainservice
+
+  ewm-db:
+    image: postgres:16.1
+    container_name: postgres-ewm-db
+    ports:
+      - "6542:5433"
+    environment:
+      - POSTGRES_PASSWORD=mainservice
+      - POSTGRES_USER=mainservice
+      - POSTGRES_DB=mainservice
