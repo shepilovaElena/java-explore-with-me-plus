@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface StatsRepository extends JpaRepository<EndpointHit, Long> {
 
+
     //Подсчитывает общее количество запросов по каждому app и uri, учитывая все IP-адреса.
     //Фильтрует по временному интервалу и по списку URI (если передан).
     //Сортирует по убыванию количества запросов.
