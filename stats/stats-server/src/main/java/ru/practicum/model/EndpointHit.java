@@ -1,14 +1,16 @@
 package ru.practicum.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Builder
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "hits")
 public class EndpointHit {
 
@@ -23,7 +25,7 @@ public class EndpointHit {
     private String uri;
     @Column(name = "ip")
     private String ip;
-    @Column(name = "timestamp")
-    private LocalDateTime timestamp;
+    @Column(name = "timepoint")
+    private LocalDateTime timepoint;
 
 }
