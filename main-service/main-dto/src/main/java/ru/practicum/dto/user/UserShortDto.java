@@ -1,5 +1,7 @@
-package user;
+package ru.practicum.dto.user;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,6 +11,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserShortDto {
+    @NotNull
     int id;
+    @NotBlank
     String name;
 }

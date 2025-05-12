@@ -1,7 +1,7 @@
-package category;
+package ru.practicum.dto.category;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -12,7 +12,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 public class CategoryDto {
     @NotNull
-    int id;
-    @NotBlank
+    int id;@Size(min = 1, max = 50)
     String name;
 }
