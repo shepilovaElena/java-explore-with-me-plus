@@ -1,4 +1,4 @@
-package ru.practicum.controller;
+package ru.practicum.event;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.error.InvalidEventTimeException;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.NewEventDto;
-import ru.practicum.service.EventService;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RequestMapping
 @RestController
@@ -20,11 +20,12 @@ import java.time.LocalDateTime;
 public class EventController {
     EventService eventService;
 
-    public EventFullDto saveEvent(@Valid @RequestBody NewEventDto newEventDto,
-                                  @RequestHeader(name = "userId") int userId) {
+    public Optional<EventFullDto> saveEvent(@Valid @RequestBody NewEventDto newEventDto,
+                                            @RequestHeader(name = "userId") int userId) {
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new InvalidEventTimeException(newEventDto.getEventDate());
         }
-        return eventService.saveEvent(newEventDto, userId);
+        return eventService.saveEvent(newEventDto, userId)
+                .orElseThrow(() -> new InternalError("Ошибка при сохранении в БД"));
     }
 }

@@ -21,9 +21,9 @@ public class ErrorHandlingControllerAdvice {
         return new ErrorResponse(errorList);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleUserNotFound(UserNotFoundException ex) {
+    public ErrorResponse handleUserNotFound(NotFoundException ex) {
         List<String> errorList = List.of(ex.getMessage());
         return new ErrorResponse(errorList);
     }

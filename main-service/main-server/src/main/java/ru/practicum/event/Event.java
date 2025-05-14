@@ -1,12 +1,19 @@
-package ru.practicum.model;
+package ru.practicum.event;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 
+@Data
+@Builder
+@NoArgsConstructor // чтобы Hibernate мог создать объект
+@AllArgsConstructor // чтобы Builder работы при NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Entity
+@Table(name = "Events")
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

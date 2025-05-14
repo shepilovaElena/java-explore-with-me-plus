@@ -1,4 +1,4 @@
-package ru.practicum.service;
+package ru.practicum.event;
 
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.NewEventDto;
