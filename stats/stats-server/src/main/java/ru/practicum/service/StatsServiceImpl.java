@@ -2,7 +2,8 @@ package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.dto.ViewStatsDto;
+import ru.practicum.EndpointHitDto;
+import ru.practicum.ViewStatsDto;
 import ru.practicum.mapper.EndpointHitMapperCustom;
 import ru.practicum.model.EndpointHit;
 import ru.practicum.repository.StatsRepository;
@@ -17,7 +18,7 @@ public class StatsServiceImpl implements StatsService {
     private final StatsRepository repository;
 
     @Override
-    public void saveHit(ru.practicum.dto.EndpointHitDto dto) {
+    public void saveHit(EndpointHitDto dto) {
         EndpointHit hit = EndpointHitMapperCustom.toModel(dto);
         repository.save(hit);
     }
