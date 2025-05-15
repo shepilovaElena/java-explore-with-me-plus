@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -16,15 +15,18 @@ public class UserAdminController {
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto postUser(UserCreateDto userCreateDto) {
-        return null;
+        return userService.createUser(userCreateDto);
     }
 
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDto> getUsers(@RequestParam ArrayList<Integer> usersIdList,
+    public List<UserDto> getUsers(@RequestParam List<Long> usersIdList,
                                   @RequestParam(defaultValue = "0") Integer from,
                                   @RequestParam(defaultValue = "10") Integer size) {
-         return null;
+        if (usersIdList != null) {
+            return userService.getUsers(usersIdList);
+        }
+        return userService.getUsers(from, size);
     }
 
     @DeleteMapping("/users/{userId}")
