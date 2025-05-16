@@ -4,9 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import ru.practicum.dto.category.CategoryDto;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.dto.event.enums.State;
 import ru.practicum.dto.user.UserShortDto;
 
 import java.time.LocalDateTime;
@@ -38,8 +38,7 @@ public class EventFullDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime publishedOn;
     Boolean requestModeration;
-    @Pattern(regexp = "PENDING|PUBLISHED|CANCELED")
-    String state;
+    State state;
     @NotBlank
     String title;
     Long views;

@@ -6,8 +6,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.StatsClient;
 import ru.practicum.dto.EndpointHitDto;
+import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.UpdatedEventDto;
+import ru.practicum.dto.event.enums.State;
+import ru.practicum.dto.event.enums.StateAction;
 import ru.practicum.error.BadRequestException;
 import ru.practicum.error.ConditionsNotMetException;
 import ru.practicum.error.NotFoundException;
@@ -65,7 +68,7 @@ public class EventServiceImpl implements EventService {
                 .build());
 
         Event event = eventOpt.get();
-        if (!event.getState().equals("CANCELED") && !event.getRequestModeration()) {
+        if (!event.getState().equals(State.CANCELED) && !event.getRequestModeration()) {
             throw new ConditionsNotMetException(
                     "Изменить можно только отменённое событие или находящееся на модерации");
         }
@@ -99,13 +102,15 @@ public class EventServiceImpl implements EventService {
             throw new ConditionsNotMetException(
                     "Нельзя изменить событие, которое начинается в течение часа");
         }
-        if (updatedEvent.getStateAction() != null && updatedEvent.getStateAction().equals("PUBLISH_EVENT")
+        if (updatedEvent.getStateAction() != null
+                && updatedEvent.getStateAction().equals(StateAction.PUBLISH_EVENT)
                 && !event.getRequestModeration()) {
             throw new ConditionsNotMetException(
                     "Нельзя опубликовать событие, которое не находится в состоянии модерации");
         }
-        if (updatedEvent.getStateAction() != null && updatedEvent.getStateAction().equals("REJECT_EVENT")
-                && event.getState().equals("PUBLISHED")) {
+        if (updatedEvent.getStateAction() != null
+                && updatedEvent.getStateAction().equals(StateAction.REJECT_EVENT)
+                && event.getState().equals(State.PUBLISHED)) {
             throw new ConditionsNotMetException(
                     "Нельзя отклонить опубликованное событие");
         }
@@ -155,9 +160,10 @@ public class EventServiceImpl implements EventService {
         List<EventFullDto> eventsWithViews = events.stream()
                 .map(e -> {
                     String uriEvent = "events/" + e.getId();
-                    e.setViews(statsClient.getStats(
-                            LocalDateTime.MIN, LocalDateTime.now(), List.of(uriEvent), false)
-                            .getFirst().getHits());
+                    List<ViewStatsDto> statsList = statsClient.getStats(
+                                    LocalDateTime.MIN, LocalDateTime.now(), List.of(uriEvent), false);
+                    long views = statsList.isEmpty() ? 0L : statsList.getFirst().getHits();
+                    e.setViews(views);
                     return e;
                     }
                 ).toList();
@@ -195,9 +201,10 @@ public class EventServiceImpl implements EventService {
         return userEvents.stream()
                 .map(e -> {
                             String uriEvent = "events/" + e.getId();
-                            e.setViews(statsClient.getStats(
-                                    LocalDateTime.MIN, LocalDateTime.now(), List.of(uriEvent), false)
-                                    .getFirst().getHits());
+                            List<ViewStatsDto> statsList = statsClient.getStats(
+                                    LocalDateTime.MIN, LocalDateTime.now(), List.of(uriEvent), false);
+                            long views = statsList.isEmpty() ? 0L : statsList.getFirst().getHits();
+                            e.setViews(views);
                             return e;
                         }
                 )
@@ -240,9 +247,10 @@ public class EventServiceImpl implements EventService {
             return Optional.empty();
         }
         EventFullDto dto = EventDtoMapper.mapToFullDto(event.get());
-        dto.setViews(statsClient.getStats(
-                LocalDateTime.MIN, LocalDateTime.now(), List.of(uri), false)
-                .getFirst().getHits());
+        List<ViewStatsDto> statsList = statsClient.getStats(
+                LocalDateTime.MIN, LocalDateTime.now(), List.of(uri), false);
+        long views = statsList.isEmpty() ? 0L : statsList.getFirst().getHits();
+        dto.setViews(views);
         return Optional.of(dto);
     }
 
@@ -276,6 +284,15 @@ public class EventServiceImpl implements EventService {
             categoryRepository.findById(dto.getCategoryId())
                     .orElseThrow(() -> new NotFoundException("Категория не найдена"));
             event.setCategoryId(dto.getCategoryId());
+        }
+        if (dto.getStateAction() != null) {
+            switch (dto.getStateAction()) {
+                case SEND_TO_REVIEW -> event.setState(State.PENDING);
+                case CANCEL_REVIEW -> event.setState(State.CANCELED);
+                case PUBLISH_EVENT -> event.setState(State.PUBLISHED);
+                case REJECT_EVENT -> event.setState(State.CANCELED);
+                default -> throw new BadRequestException("Неизвестное действие: " + dto.getStateAction());
+            }
         }
     }
 }

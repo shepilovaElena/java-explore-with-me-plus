@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.dto.event.enums.State;
 
 import java.time.LocalDateTime;
 
@@ -34,7 +35,8 @@ public class Event {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime publishedOn;
     Boolean requestModeration;
-    String state;
+    @Enumerated(EnumType.STRING)
+    State state;
     String title;
     Long views;
 }

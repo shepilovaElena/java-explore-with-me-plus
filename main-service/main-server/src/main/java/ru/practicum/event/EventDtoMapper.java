@@ -3,13 +3,11 @@ package ru.practicum.event;
 import lombok.RequiredArgsConstructor;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.Location;
-import ru.practicum.zaglushkiToDelete.UserService;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.NewEventDto;
 
 @RequiredArgsConstructor
 public class EventDtoMapper {
-
     static CategoryService categoryService;
     static UserService userService;
 
