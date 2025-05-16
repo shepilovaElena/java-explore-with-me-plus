@@ -12,7 +12,7 @@ public interface EventService {
 
     List<EventFullDto> getEvents(String text, List<Integer> categories, boolean paid,
                                  String rangeStart, String rangeEnd, boolean onlyAvailable,
-                                 String sort, Integer from, Integer size);
+                                 String sort, Integer from, Integer size, String ip);
 
-    Optional<EventFullDto> getEventById(int id);
+    Optional<EventFullDto> getEventById(int id, String ip);
 }

@@ -16,7 +16,8 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
             "AND (:paid IS NULL OR e.paid = :paid) " +
             "AND (:rangeStart IS NULL OR e.eventDate > :rangeStart) " +
             "AND (:rangeEnd IS NULL OR e.eventDate < :rangeEnd) " +
-            "AND (:onlyAvailable IS NULL OR e.participantLimit > 0")
+            "AND (:onlyAvailable IS NULL OR e.participantLimit > 0)" +
+            "AND (e.requestModeration = TRUE)")
     Page<Event> getEvents(@Param("text") String text,
                           @Param("categories") List<Integer> categories,
                           @Param("paid") Boolean paid,

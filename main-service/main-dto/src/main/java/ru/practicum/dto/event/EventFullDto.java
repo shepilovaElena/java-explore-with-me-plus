@@ -42,5 +42,5 @@ public class EventFullDto {
     String state;
     @NotBlank
     String title;
-    int views;
+    Long views;
 }

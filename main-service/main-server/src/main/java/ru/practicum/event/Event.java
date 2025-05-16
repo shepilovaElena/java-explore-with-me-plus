@@ -36,5 +36,5 @@ public class Event {
     Boolean requestModeration;
     String state;
     String title;
-    int views;
+    Long views;
 }

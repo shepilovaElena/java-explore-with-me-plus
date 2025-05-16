@@ -1,5 +1,6 @@
 package ru.practicum.event;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,15 +17,17 @@ import java.util.List;
 @RequestMapping
 @RequiredArgsConstructor
 public class EventController {
-    EventService eventService;
+    private final EventService eventService;
 
     @PostMapping("/users/{userId}/events")
     public EventFullDto saveEvent(@Valid @RequestBody NewEventDto newEventDto,
-                                            @PathVariable(name = "userId") int userId) {
+                                  @PathVariable(name = "userId") int userId,
+                                  HttpServletRequest request) {
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new InvalidEventTimeException(newEventDto.getEventDate());
         }
-        return eventService.saveEvent(newEventDto, userId)
+        String ip = request.getRemoteAddr();
+        return eventService.saveEvent(newEventDto, userId, ip)
                 .orElseThrow(() -> new InternalError("Ошибка при сохранении в БД"));
     }
 
@@ -38,16 +41,20 @@ public class EventController {
             @RequestParam(required = false) String rangeEnd,
             @RequestParam(required = false) String sort,
             @RequestParam(defaultValue = "0") Integer from,
-            @RequestParam(defaultValue = "10") Integer size
+            @RequestParam(defaultValue = "10") Integer size,
+            HttpServletRequest request
     ) {
+        String ip = request.getRemoteAddr();
         return eventService.getEvents(text, categories, paid,
                                         rangeStart, rangeEnd,
-                                        onlyAvailable, sort, from, size);
+                                        onlyAvailable, sort, from, size,
+                                        ip);
     }
 
     @GetMapping("/events/{id}")
-    public EventFullDto getEventById(@PathVariable int id) {
-        return eventService.getEventById(id)
+    public EventFullDto getEventById(@PathVariable int id, HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+        return eventService.getEventById(id, ip)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден"));
     }
 }

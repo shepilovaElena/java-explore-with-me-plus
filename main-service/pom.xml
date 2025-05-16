@@ -20,15 +20,6 @@
         <module>main-server</module>
     </modules>
 
-    <dependencies>
-        <dependency>
-            <groupId>ru.practicum</groupId>
-            <artifactId>stats-client</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
-
-
     <name>Explore With Me - Main Service</name>
 
     <properties>
