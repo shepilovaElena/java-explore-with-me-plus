@@ -5,9 +5,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import ru.practicum.dto.event.EventFullDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<Event, Integer> {
 
@@ -27,4 +29,8 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
                           @Param("onlyAvailable") Boolean onlyAvailable,
                           @Param("isAdmin") Boolean isAdmin,
                           Pageable pageable);
+
+    List<Event> findAllByUserId(int userId, Pageable page);
+
+    Optional<Event> findByUserIdAndId(int userId, int eventId);
 }

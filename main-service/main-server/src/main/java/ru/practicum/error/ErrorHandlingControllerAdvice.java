@@ -27,4 +27,11 @@ public class ErrorHandlingControllerAdvice {
         List<String> errorList = List.of(ex.getMessage());
         return new ErrorResponse(errorList);
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBadRequest(BadRequestException ex) {
+        List<String> errorList = List.of(ex.getMessage());
+        return new ErrorResponse(errorList);
+    }
 }

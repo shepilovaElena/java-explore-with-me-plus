@@ -3,8 +3,10 @@ package ru.practicum.event;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.web.bind.annotation.*;
 
+import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.error.InvalidEventTimeException;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.NewEventDto;
@@ -31,6 +33,13 @@ public class EventController {
                 .orElseThrow(() -> new InternalError("Ошибка при сохранении в БД"));
     }
 
+    @GetMapping("/events/{id}")
+    public EventFullDto getEventById(@PathVariable int id, HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+        return eventService.getEventById(id, ip)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден"));
+    }
+
     @GetMapping("/events")
     public List<EventFullDto> getEvents(
             @RequestParam(required = false) String text,
@@ -51,6 +60,25 @@ public class EventController {
                                         ip, "user");
     }
 
+    @GetMapping("/users/{userId}/events")
+    public List<EventShortDto> getEventsByUserId(@PathVariable int userId, HttpServletRequest request,
+                                                 @RequestParam(required = false) int from,
+                                                 @RequestParam(required = false) int size) {
+        String ip = request.getRemoteAddr();
+        return eventService.getEventsByUserId(userId, from, size, ip);
+    }
+
+    @GetMapping("/users/{userId}/events/{eventId}")
+    public EventShortDto getEventByUserIdAndEventId(@PathVariable int userId,
+                                                          @PathVariable int eventId,
+                                                          HttpServletRequest request,
+                                                          @RequestParam(required = false) int from,
+                                                          @RequestParam(required = false) int size) {
+        String ip = request.getRemoteAddr();
+        return eventService.getEventByUserIdAndEventId(userId, eventId, from, size, ip)
+                .orElseThrow(() -> new NotFoundException("Событие с id " + eventId + " не найдено"));
+    }
+
     @GetMapping("/admin/events")
     public List<EventFullDto> getAdminEvents(
             @RequestParam(required = false) String text,
@@ -69,12 +97,5 @@ public class EventController {
                 rangeStart, rangeEnd,
                 onlyAvailable, sort, from, size,
                 ip, "admin");
-    }
-
-    @GetMapping("/events/{id}")
-    public EventFullDto getEventById(@PathVariable int id, HttpServletRequest request) {
-        String ip = request.getRemoteAddr();
-        return eventService.getEventById(id, ip)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден"));
     }
 }

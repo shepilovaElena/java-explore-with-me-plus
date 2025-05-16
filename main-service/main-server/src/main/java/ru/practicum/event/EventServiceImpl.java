@@ -6,7 +6,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.StatsClient;
 import ru.practicum.dto.EndpointHitDto;
-import ru.practicum.zaglushkiToDelete.UserService;
+import ru.practicum.dto.event.EventShortDto;
+import ru.practicum.error.BadRequestException;
 import ru.practicum.error.NotFoundException;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.NewEventDto;
@@ -25,6 +26,12 @@ public class EventServiceImpl implements EventService {
     private final StatsClient statsClient;
 
     public Optional<EventFullDto> saveEvent(NewEventDto newEventDto, int userId, String ip) {
+        if (userService.findUserById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь с id " + userId + " не найден");
+        }
+        if (categoryService.findCategoryById(newEventDto.getCategoryId()).isEmpty()) {
+            throw new NotFoundException("Категория с id " + newEventDto.getCategoryId() + " не найдена");
+        }
         String uri = "/users/" + userId + "/events";
         statsClient.saveHit(EndpointHitDto.builder()
                 .app("main-service")
@@ -32,12 +39,6 @@ public class EventServiceImpl implements EventService {
                 .uri(uri)
                 .timestamp(LocalDateTime.now())
                 .build());
-        if (userService.findUserById(userId).isEmpty()) {
-            throw new NotFoundException("Пользователь с id " + userId + " не найден");
-        }
-        if (categoryService.findCategoryById(newEventDto.getCategoryId()).isEmpty()) {
-            throw new NotFoundException("Категория с id " + newEventDto.getCategoryId() + " не найдена");
-        }
         Event event = EventDtoMapper.mapToModel(newEventDto, userId);
         Event savedEvent = eventRepository.save(event);
         return Optional.of(EventDtoMapper.mapToFullDto(savedEvent));
@@ -87,14 +88,71 @@ public class EventServiceImpl implements EventService {
                             .getFirst().getHits());
                     return e;
                     }
-                )
-                .toList();
+                ).toList();
+
         if (sort.equals("VIEWS")) {
             return events.stream()
                     .sorted(Comparator.comparing(EventFullDto::getViews))
                     .toList();
         }
+
         return eventsWithViews;
+    }
+
+    public List<EventShortDto> getEventsByUserId(int userId, Integer from, Integer size, String ip) {
+        if (userService.findUserById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь с id " + userId + " не найден");
+        }
+        if (size != null & size < 0) {
+            throw new BadRequestException("Некорректный запрос: размер возвращаемого списка отрицательный");
+        }
+        String uri = "/users/" + userId + "/events";
+        statsClient.saveHit(EndpointHitDto.builder()
+                .app("main-service")
+                .ip(ip)
+                .uri(uri)
+                .timestamp(LocalDateTime.now())
+                .build());
+
+
+        int safeFrom = (from != null) ? from : 0;
+        int safeSize = (size != null) ? size : 10;
+        PageRequest page = PageRequest.of(safeFrom / safeSize, safeSize);
+        List<Event> userEvents = eventRepository.findAllByUserId(userId, page);
+
+        return userEvents.stream()
+                .map(e -> {
+                            String uriEvent = "events/" + e.getId();
+                            e.setViews(statsClient.getStats(
+                                    LocalDateTime.MIN, LocalDateTime.now(), List.of(uriEvent), false)
+                                    .getFirst().getHits());
+                            return e;
+                        }
+                )
+                .map(EventDtoMapper::mapToShortDto)
+                .toList();
+    }
+
+    public Optional<EventShortDto> getEventByUserIdAndEventId(int userId, int eventId,
+                                                              Integer from, Integer size, String ip) {
+        if (userService.findUserById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь с id " + userId + " не найден");
+        }
+        String uri = "/users/" + userId + "/events/" + eventId;
+        statsClient.saveHit(EndpointHitDto.builder()
+                .app("main-service")
+                .ip(ip)
+                .uri(uri)
+                .timestamp(LocalDateTime.now())
+                .build());
+
+        Optional<Event> event = eventRepository.findByUserIdAndId(userId, eventId);
+        if (event.isEmpty()) {
+            return Optional.empty();
+        }
+        EventShortDto eventShortDto = EventDtoMapper.mapToShortDto(event.get());
+
+        return Optional.of(eventShortDto);
     }
 
     public Optional<EventFullDto> getEventById(int id, String ip) {
