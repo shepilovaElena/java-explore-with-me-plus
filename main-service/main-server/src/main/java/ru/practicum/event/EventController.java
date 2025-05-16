@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.error.InvalidEventTimeException;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.NewEventDto;
+import ru.practicum.error.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,5 +43,11 @@ public class EventController {
         return eventService.getEvents(text, categories, paid,
                                         rangeStart, rangeEnd,
                                         onlyAvailable, sort, from, size);
+    }
+
+    @GetMapping("/events/{id}")
+    public EventFullDto getEventById(@PathVariable int id) {
+        return eventService.getEventById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден"));
     }
 }

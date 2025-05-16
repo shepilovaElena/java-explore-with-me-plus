@@ -35,7 +35,7 @@ public class EventServiceImpl implements EventService {
                                         String sort, Integer from, Integer size) {
         Sort sortParam = switch (sort) {
             case "EVENT_DATE" -> Sort.by("eventDate").ascending();
-            //case "VIEWS" -> Sort.by("views").descending(); <--------- мы же не храним VIEWS в БД
+            //=case "VIEWS" -> Sort.by("views").descending(); // <--------- мы же не храним VIEWS в БД
             default -> Sort.unsorted();
         };
         int safeFrom = (from != null) ? from : 0;
@@ -47,5 +47,15 @@ public class EventServiceImpl implements EventService {
                 .stream()
                 .map(EventDtoMapper::mapToFullDto)
                 .toList();
+    }
+
+    public Optional<EventFullDto> getEventById(int id) {
+        Optional<Event> event = eventRepository.findById(id);
+        if (event.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(
+                EventDtoMapper.mapToFullDto(event.get())
+        );
     }
 }
