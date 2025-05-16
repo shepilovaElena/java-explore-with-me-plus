@@ -34,4 +34,11 @@ public class ErrorHandlingControllerAdvice {
         List<String> errorList = List.of(ex.getMessage());
         return new ErrorResponse(errorList);
     }
+
+    @ExceptionHandler(ConditionsNotMetException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleConditionsNotMetException(ConditionsNotMetException ex) {
+        List<String> errorList = List.of(ex.getMessage());
+        return new ErrorResponse(errorList);
+    }
 }

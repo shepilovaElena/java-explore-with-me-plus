@@ -3,7 +3,6 @@ package ru.practicum.event;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.web.bind.annotation.*;
 
 import ru.practicum.dto.event.EventShortDto;
@@ -30,7 +29,17 @@ public class EventController {
         }
         String ip = request.getRemoteAddr();
         return eventService.saveEvent(newEventDto, userId, ip)
-                .orElseThrow(() -> new InternalError("Ошибка при сохранении в БД"));
+                .orElseThrow(() -> new InternalError("Неизвестная ошибка"));
+    }
+
+    @PatchMapping("/users/{userId}/events/{eventId}")
+    public EventFullDto updateEventByIdAndUserId(@RequestBody NewEventDto newEventDto,
+                                                 @PathVariable int userId,
+                                                 @PathVariable int eventId,
+                                                 HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+        return eventService.updateEvent(newEventDto, userId, eventId, ip)
+                .orElseThrow(() -> new InternalError("Неизвестная ошибка"));
     }
 
     @GetMapping("/events/{id}")

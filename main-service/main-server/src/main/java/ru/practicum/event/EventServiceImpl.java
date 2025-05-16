@@ -8,6 +8,7 @@ import ru.practicum.StatsClient;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.error.BadRequestException;
+import ru.practicum.error.ConditionsNotMetException;
 import ru.practicum.error.NotFoundException;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.NewEventDto;
@@ -24,12 +25,13 @@ public class EventServiceImpl implements EventService {
     private final UserService userService;
     private final EventRepository eventRepository;
     private final StatsClient statsClient;
+    private final CategoryService categoryService;
 
     public Optional<EventFullDto> saveEvent(NewEventDto newEventDto, int userId, String ip) {
-        if (userService.findUserById(userId).isEmpty()) {
+        if (userService.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
-        if (categoryService.findCategoryById(newEventDto.getCategoryId()).isEmpty()) {
+        if (categoryService.findById(newEventDto.getCategoryId()).isEmpty()) {
             throw new NotFoundException("Категория с id " + newEventDto.getCategoryId() + " не найдена");
         }
         String uri = "/users/" + userId + "/events";
@@ -42,6 +44,39 @@ public class EventServiceImpl implements EventService {
         Event event = EventDtoMapper.mapToModel(newEventDto, userId);
         Event savedEvent = eventRepository.save(event);
         return Optional.of(EventDtoMapper.mapToFullDto(savedEvent));
+    }
+
+    public Optional<EventFullDto> updateEvent(NewEventDto updatedEvent,
+                                              int userId, int eventId, String ip) {
+        if (userService.findUserById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь с id " + userId + " не найден");
+        }
+        Optional<Event> eventOpt = eventRepository.findById(eventId);
+        if (eventOpt.isEmpty()) {
+            throw new NotFoundException("Событие с id " + eventId + " не найдено");
+        }
+        String uri = "/users/" + userId + "/events/" + eventId;
+        statsClient.saveHit(EndpointHitDto.builder()
+                .app("main-service")
+                .ip(ip)
+                .uri(uri)
+                .timestamp(LocalDateTime.now())
+                .build());
+
+        Event event = eventOpt.get();
+        if (!event.getState().equals("CANCELED") && !event.getRequestModeration()) {
+            throw new ConditionsNotMetException(
+                    "Изменить можно только отменённое событие или находящееся на модерации");
+        }
+        if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
+            throw new ConditionsNotMetException(
+                    "Нельзя изменить событие, которое начинается в течение двух часов");
+        }
+
+        applyUpdate(event, updatedEvent);
+        Event savedUpdatedEvent = eventRepository.save(event);
+
+        return Optional.of(EventDtoMapper.mapToFullDto(savedUpdatedEvent));
     }
 
     public List<EventFullDto> getEvents(String text, List<Integer> categories, boolean paid,
@@ -172,5 +207,38 @@ public class EventServiceImpl implements EventService {
                 LocalDateTime.MIN, LocalDateTime.now(), List.of(uri), false)
                 .getFirst().getHits());
         return Optional.of(dto);
+    }
+
+    public void applyUpdate(Event event, NewEventDto dto) {
+        if (dto.getAnnotation() != null) {
+            event.setAnnotation(dto.getAnnotation());
+        }
+        if (dto.getDescription() != null) {
+            event.setDescription(dto.getDescription());
+        }
+        if (dto.getEventDate() != null) {
+            event.setEventDate(dto.getEventDate());
+        }
+        if (dto.getLocation() != null) {
+            event.setLocation_lat(dto.getLocation().getLat());
+            event.setLocation_lon(dto.getLocation().getLon());
+        }
+        if (dto.getPaid() != null) {
+            event.setPaid(dto.getPaid());
+        }
+        if (dto.getParticipantLimit() > 0) {
+            event.setParticipantLimit(dto.getParticipantLimit());
+        }
+        if (dto.getRequestModeration() != null) {
+            event.setRequestModeration(dto.getRequestModeration());
+        }
+        if (dto.getTitle() != null) {
+            event.setTitle(dto.getTitle());
+        }
+        if (dto.getCategoryId() > 0) {
+            categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new NotFoundException("Категория не найдена"));
+            event.setCategoryId(dto.getCategoryId());
+        }
     }
 }

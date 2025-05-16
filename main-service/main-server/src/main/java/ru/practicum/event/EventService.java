@@ -22,4 +22,7 @@ public interface EventService {
 
     Optional<EventShortDto> getEventByUserIdAndEventId(int userId, int eventId,
                                                        Integer from, Integer size, String ip);
+
+    Optional<EventFullDto> updateEvent(NewEventDto newEventDto,
+                                       int userId, int eventId, String ip);
 }
