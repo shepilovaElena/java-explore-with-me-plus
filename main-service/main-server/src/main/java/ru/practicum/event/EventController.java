@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import ru.practicum.dto.event.EventShortDto;
+import ru.practicum.dto.event.UpdatedEventDto;
 import ru.practicum.error.InvalidEventTimeException;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.NewEventDto;
@@ -33,12 +34,21 @@ public class EventController {
     }
 
     @PatchMapping("/users/{userId}/events/{eventId}")
-    public EventFullDto updateEventByIdAndUserId(@RequestBody NewEventDto newEventDto,
+    public EventFullDto updateEventByIdAndUserId(@RequestBody @Valid UpdatedEventDto updatedEventDto,
                                                  @PathVariable int userId,
                                                  @PathVariable int eventId,
                                                  HttpServletRequest request) {
         String ip = request.getRemoteAddr();
-        return eventService.updateEvent(newEventDto, userId, eventId, ip)
+        return eventService.updateEvent(updatedEventDto, userId, eventId, ip)
+                .orElseThrow(() -> new InternalError("Неизвестная ошибка"));
+    }
+
+    @PatchMapping("/admin/events/{eventId}")
+    public EventFullDto updateAdminEventByIdAndUserId(@RequestBody @Valid UpdatedEventDto updatedEventDto,
+                                                 @PathVariable int eventId,
+                                                 HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+        return eventService.updateAdminEvent(updatedEventDto, eventId, ip)
                 .orElseThrow(() -> new InternalError("Неизвестная ошибка"));
     }
 

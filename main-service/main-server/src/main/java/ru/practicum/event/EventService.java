@@ -3,6 +3,7 @@ package ru.practicum.event;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.NewEventDto;
+import ru.practicum.dto.event.UpdatedEventDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,9 @@ public interface EventService {
     Optional<EventShortDto> getEventByUserIdAndEventId(int userId, int eventId,
                                                        Integer from, Integer size, String ip);
 
-    Optional<EventFullDto> updateEvent(NewEventDto newEventDto,
+    Optional<EventFullDto> updateEvent(UpdatedEventDto updatedEventDto,
                                        int userId, int eventId, String ip);
+
+    Optional<EventFullDto> updateAdminEvent(UpdatedEventDto updatedEventDto,
+                                            int eventId, String ip);
 }

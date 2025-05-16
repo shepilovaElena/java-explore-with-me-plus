@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.StatsClient;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.event.EventShortDto;
+import ru.practicum.dto.event.UpdatedEventDto;
 import ru.practicum.error.BadRequestException;
 import ru.practicum.error.ConditionsNotMetException;
 import ru.practicum.error.NotFoundException;
@@ -46,9 +47,9 @@ public class EventServiceImpl implements EventService {
         return Optional.of(EventDtoMapper.mapToFullDto(savedEvent));
     }
 
-    public Optional<EventFullDto> updateEvent(NewEventDto updatedEvent,
+    public Optional<EventFullDto> updateEvent(UpdatedEventDto updatedEvent,
                                               int userId, int eventId, String ip) {
-        if (userService.findUserById(userId).isEmpty()) {
+        if (userService.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
         Optional<Event> eventOpt = eventRepository.findById(eventId);
@@ -71,6 +72,42 @@ public class EventServiceImpl implements EventService {
         if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new ConditionsNotMetException(
                     "Нельзя изменить событие, которое начинается в течение двух часов");
+        }
+
+        applyUpdate(event, updatedEvent);
+        Event savedUpdatedEvent = eventRepository.save(event);
+
+        return Optional.of(EventDtoMapper.mapToFullDto(savedUpdatedEvent));
+    }
+
+    public Optional<EventFullDto> updateAdminEvent(UpdatedEventDto updatedEvent,
+                                                   int eventId, String ip) {
+        Optional<Event> eventOpt = eventRepository.findById(eventId);
+        if (eventOpt.isEmpty()) {
+            throw new NotFoundException("Событие с id " + eventId + " не найдено");
+        }
+        String uri = "/admin/events/" + eventId;
+        statsClient.saveHit(EndpointHitDto.builder()
+                .app("main-service")
+                .ip(ip)
+                .uri(uri)
+                .timestamp(LocalDateTime.now())
+                .build());
+
+        Event event = eventOpt.get();
+        if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
+            throw new ConditionsNotMetException(
+                    "Нельзя изменить событие, которое начинается в течение часа");
+        }
+        if (updatedEvent.getStateAction() != null && updatedEvent.getStateAction().equals("PUBLISH_EVENT")
+                && !event.getRequestModeration()) {
+            throw new ConditionsNotMetException(
+                    "Нельзя опубликовать событие, которое не находится в состоянии модерации");
+        }
+        if (updatedEvent.getStateAction() != null && updatedEvent.getStateAction().equals("REJECT_EVENT")
+                && event.getState().equals("PUBLISHED")) {
+            throw new ConditionsNotMetException(
+                    "Нельзя отклонить опубликованное событие");
         }
 
         applyUpdate(event, updatedEvent);
@@ -135,7 +172,7 @@ public class EventServiceImpl implements EventService {
     }
 
     public List<EventShortDto> getEventsByUserId(int userId, Integer from, Integer size, String ip) {
-        if (userService.findUserById(userId).isEmpty()) {
+        if (userService.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
         if (size != null & size < 0) {
@@ -170,7 +207,7 @@ public class EventServiceImpl implements EventService {
 
     public Optional<EventShortDto> getEventByUserIdAndEventId(int userId, int eventId,
                                                               Integer from, Integer size, String ip) {
-        if (userService.findUserById(userId).isEmpty()) {
+        if (userService.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
         String uri = "/users/" + userId + "/events/" + eventId;
@@ -209,7 +246,7 @@ public class EventServiceImpl implements EventService {
         return Optional.of(dto);
     }
 
-    public void applyUpdate(Event event, NewEventDto dto) {
+    public void applyUpdate(Event event, UpdatedEventDto dto) {
         if (dto.getAnnotation() != null) {
             event.setAnnotation(dto.getAnnotation());
         }
