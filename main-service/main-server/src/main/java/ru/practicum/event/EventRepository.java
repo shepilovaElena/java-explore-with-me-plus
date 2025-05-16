@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Integer> {
@@ -17,12 +18,13 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
             "AND (:rangeStart IS NULL OR e.eventDate > :rangeStart) " +
             "AND (:rangeEnd IS NULL OR e.eventDate < :rangeEnd) " +
             "AND (:onlyAvailable IS NULL OR e.participantLimit > 0)" +
-            "AND (e.requestModeration = TRUE)")
+            "AND (:isAdmin = TRUE OR e.requestModeration = FALSE)")
     Page<Event> getEvents(@Param("text") String text,
                           @Param("categories") List<Integer> categories,
                           @Param("paid") Boolean paid,
-                          @Param("rangeStart") String rangeStart,
-                          @Param("rangeEnd") String rangeEnd,
+                          @Param("rangeStart") LocalDateTime rangeStart,
+                          @Param("rangeEnd") LocalDateTime rangeEnd,
                           @Param("onlyAvailable") Boolean onlyAvailable,
+                          @Param("isAdmin") Boolean isAdmin,
                           Pageable pageable);
 }

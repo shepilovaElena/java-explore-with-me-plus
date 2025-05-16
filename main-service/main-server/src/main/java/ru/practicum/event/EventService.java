@@ -8,11 +8,12 @@ import java.util.Optional;
 
 public interface EventService {
 
-    Optional<EventFullDto> saveEvent(NewEventDto newEventDto, int userId);
+    Optional<EventFullDto> saveEvent(NewEventDto newEventDto, int userId, String ip);
 
     List<EventFullDto> getEvents(String text, List<Integer> categories, boolean paid,
                                  String rangeStart, String rangeEnd, boolean onlyAvailable,
-                                 String sort, Integer from, Integer size, String ip);
+                                 String sort, Integer from, Integer size,
+                                 String ip, String user);
 
     Optional<EventFullDto> getEventById(int id, String ip);
 }

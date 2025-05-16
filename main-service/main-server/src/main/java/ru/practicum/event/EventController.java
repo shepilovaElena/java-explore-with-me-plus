@@ -48,7 +48,27 @@ public class EventController {
         return eventService.getEvents(text, categories, paid,
                                         rangeStart, rangeEnd,
                                         onlyAvailable, sort, from, size,
-                                        ip);
+                                        ip, "user");
+    }
+
+    @GetMapping("/admin/events")
+    public List<EventFullDto> getAdminEvents(
+            @RequestParam(required = false) String text,
+            @RequestParam(required = false) List<Integer> categories,
+            @RequestParam(required = false) Boolean paid,
+            @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable,
+            @RequestParam(required = false) String rangeStart,
+            @RequestParam(required = false) String rangeEnd,
+            @RequestParam(required = false) String sort,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size,
+            HttpServletRequest request
+    ) {
+        String ip = request.getRemoteAddr();
+        return eventService.getEvents(text, categories, paid,
+                rangeStart, rangeEnd,
+                onlyAvailable, sort, from, size,
+                ip, "admin");
     }
 
     @GetMapping("/events/{id}")

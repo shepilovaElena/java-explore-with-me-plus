@@ -12,6 +12,7 @@ import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.NewEventDto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -44,14 +45,16 @@ public class EventServiceImpl implements EventService {
 
     public List<EventFullDto> getEvents(String text, List<Integer> categories, boolean paid,
                                         String rangeStart, String rangeEnd, boolean onlyAvailable,
-                                        String sort, Integer from, Integer size, String ip) {
-        String uri = "/events";
+                                        String sort, Integer from, Integer size, String ip, String user) {
+        boolean isAdmin = !"user".equalsIgnoreCase(user);
+        String uri = isAdmin ? "/admin/events" : "/events";
         statsClient.saveHit(EndpointHitDto.builder()
                 .app("main-service")
                 .ip(ip)
                 .uri(uri)
                 .timestamp(LocalDateTime.now())
                 .build());
+
         Sort sortParam = switch (sort) {
             case "EVENT_DATE" -> Sort.by("eventDate").ascending();
             default -> Sort.unsorted();
@@ -62,12 +65,20 @@ public class EventServiceImpl implements EventService {
         if (rangeStart == null) {
             rangeStart = LocalDateTime.now().toString();
         }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime start = LocalDateTime.parse(rangeStart, formatter);
+        LocalDateTime end = (rangeEnd == null || rangeEnd.isBlank())
+                ? null
+                : LocalDateTime.parse(rangeEnd, formatter);
+
         List<EventFullDto> events = eventRepository.getEvents(text, categories, paid,
-                        rangeStart, rangeEnd, onlyAvailable,
-                        page)
+                        start, end, onlyAvailable,
+                        isAdmin, page)
                 .stream()
                 .map(EventDtoMapper::mapToFullDto)
                 .toList();
+
         List<EventFullDto> eventsWithViews = events.stream()
                 .map(e -> {
                     String uriEvent = "events/" + e.getId();
