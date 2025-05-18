@@ -1,12 +1,23 @@
+
 package ru.practicum.error;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-@RequiredArgsConstructor
 @Getter
 public class ErrorResponse {
-    private final List<String> errors;
+
+    private final HttpStatus status;
+    private final String reason;
+    private final String message;
+    private final String timestamp;
+
+    public ErrorResponse(HttpStatus status, String reason, String message) {
+        this.status = status;
+        this.reason = reason;
+        this.message = message;
+        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 }
