@@ -1,8 +1,13 @@
 package ru.practicum.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.exception.ConflictPropertyConstraintException;
+import ru.practicum.exception.NotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,29 +16,31 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public UserDto createUser(UserCreateDto userCreateDto) {
-        User user = UserMapper.toModel(userCreateDto);
-     return UserMapper.toDto(userRepository.save(user));
-    }
-
-    public List<UserDto> getUsers(int from, int size) {
-        List<User> userList = userRepository.findAll(PageRequest.of(from > 0 ? from / size : 0, size)).toList();
-        if (userList.isEmpty()) {
-            return List.of();
+    public UserDto createUser(UserDto userDto) {
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new ConflictPropertyConstraintException(String.format("Email %s уже зарегистрирован ",
+                    userDto.getEmail()));
         }
-        return userList.stream()
-                .map(UserMapper::toDto)
+        final User user = userMapper.toUser(userDto);
+        return userMapper.toUserDto(userRepository.save(user));
+    }
+
+    public List<UserDto> getUsers(List<Long> ids, Integer from, Integer size) {
+        final Pageable pageable = PageRequest.of(0, size + from, Sort.by("id").ascending());
+        Page<User> users;
+        if (ids == null || ids.isEmpty()) {
+            users = userRepository.findAll(pageable);
+        } else {
+            users = userRepository.findAllByIdIn(ids, PageRequest.of(from > 0 ? from / size : 0, size)); /// нужна ли сортировка?
+        }
+        return users.stream()
+                .map(userMapper::toUserDto)
                 .toList();
     }
 
-    public List<UserDto> getUsers(List<Long> usersList) {
-        return userRepository.findAllById(usersList).stream()
-                .map(UserMapper::toDto)
-                .toList();
-    }
-
-    public void deleteUserById(long id) {
+    public void deleteUserById(Long id) {
         checkUserId(id);
         userRepository.deleteById(id);
     }

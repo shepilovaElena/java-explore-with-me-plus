@@ -7,33 +7,28 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/admin/users")
 @RequiredArgsConstructor
 public class UserAdminController {
     private final UserServiceImpl userService;
 
-    @PostMapping("/users")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto postUser(UserCreateDto userCreateDto) {
-        return userService.createUser(userCreateDto);
+    public UserDto postUser(UserDto userDto) {
+        return userService.createUser(userDto);
     }
 
-    @GetMapping("/users")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getUsers(@RequestParam List<Long> usersIdList,
                                   @RequestParam(defaultValue = "0") Integer from,
                                   @RequestParam(defaultValue = "10") Integer size) {
-        if (usersIdList != null) {
-            return userService.getUsers(usersIdList);
-        }
-        return userService.getUsers(from, size);
+        return userService.getUsers(usersIdList,from, size);
     }
 
-    @DeleteMapping("/users/{userId}")
-    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUserById(@PathVariable Long userId) {
 
     }
-
-
 }
