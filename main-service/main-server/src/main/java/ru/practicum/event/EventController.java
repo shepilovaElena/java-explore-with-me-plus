@@ -4,15 +4,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import ru.practicum.dto.event.EventShortDto;
-import ru.practicum.dto.event.UpdatedEventDto;
-import ru.practicum.error.InvalidEventTimeException;
 import ru.practicum.dto.event.EventFullDto;
+import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.NewEventDto;
-import ru.practicum.error.NotFoundException;
+import ru.practicum.dto.event.UpdatedEventDto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -23,46 +19,42 @@ public class EventController {
 
     @PostMapping("/users/{userId}/events")
     public EventFullDto saveEvent(@Valid @RequestBody NewEventDto newEventDto,
-                                  @PathVariable(name = "userId") int userId,
+                                  @PathVariable(name = "userId") Long userId,
                                   HttpServletRequest request) {
-        if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-            throw new InvalidEventTimeException(newEventDto.getEventDate());
-        }
+//        if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
+//            throw new InvalidEventTimeException(newEventDto.getEventDate());
+//        }
         String ip = request.getRemoteAddr();
-        return eventService.saveEvent(newEventDto, userId, ip)
-                .orElseThrow(() -> new InternalError("Неизвестная ошибка"));
+        return eventService.saveEvent(newEventDto, userId, ip);
     }
 
     @PatchMapping("/users/{userId}/events/{eventId}")
     public EventFullDto updateEventByIdAndUserId(@RequestBody @Valid UpdatedEventDto updatedEventDto,
-                                                 @PathVariable int userId,
-                                                 @PathVariable int eventId,
+                                                 @PathVariable Long userId,
+                                                 @PathVariable Long eventId,
                                                  HttpServletRequest request) {
         String ip = request.getRemoteAddr();
-        return eventService.updateEvent(updatedEventDto, userId, eventId, ip)
-                .orElseThrow(() -> new InternalError("Неизвестная ошибка"));
+        return eventService.updateEvent(updatedEventDto, userId, eventId, ip);
     }
 
     @PatchMapping("/admin/events/{eventId}")
     public EventFullDto updateAdminEventByIdAndUserId(@RequestBody @Valid UpdatedEventDto updatedEventDto,
-                                                 @PathVariable int eventId,
+                                                 @PathVariable Long eventId,
                                                  HttpServletRequest request) {
         String ip = request.getRemoteAddr();
-        return eventService.updateAdminEvent(updatedEventDto, eventId, ip)
-                .orElseThrow(() -> new InternalError("Неизвестная ошибка"));
+        return eventService.updateAdminEvent(updatedEventDto, eventId, ip);
     }
 
     @GetMapping("/events/{id}")
-    public EventFullDto getEventById(@PathVariable int id, HttpServletRequest request) {
+    public EventFullDto getEventById(@PathVariable Long id, HttpServletRequest request) {
         String ip = request.getRemoteAddr();
-        return eventService.getEventById(id, ip)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден"));
+        return eventService.getEventById(id, ip);
     }
 
     @GetMapping("/events")
     public List<EventFullDto> getEvents(
             @RequestParam(required = false) String text,
-            @RequestParam(required = false) List<Integer> categories,
+            @RequestParam(required = false) List<Long> categories,
             @RequestParam(required = false) Boolean paid,
             @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable,
             @RequestParam(required = false) String rangeStart,
@@ -80,7 +72,7 @@ public class EventController {
     }
 
     @GetMapping("/users/{userId}/events")
-    public List<EventShortDto> getEventsByUserId(@PathVariable int userId, HttpServletRequest request,
+    public List<EventShortDto> getEventsByUserId(@PathVariable Long userId, HttpServletRequest request,
                                                  @RequestParam(required = false) int from,
                                                  @RequestParam(required = false) int size) {
         String ip = request.getRemoteAddr();
@@ -88,20 +80,19 @@ public class EventController {
     }
 
     @GetMapping("/users/{userId}/events/{eventId}")
-    public EventShortDto getEventByUserIdAndEventId(@PathVariable int userId,
-                                                          @PathVariable int eventId,
+    public EventShortDto getEventByUserIdAndEventId(@PathVariable Long userId,
+                                                          @PathVariable Long eventId,
                                                           HttpServletRequest request,
                                                           @RequestParam(required = false) int from,
                                                           @RequestParam(required = false) int size) {
         String ip = request.getRemoteAddr();
-        return eventService.getEventByUserIdAndEventId(userId, eventId, from, size, ip)
-                .orElseThrow(() -> new NotFoundException("Событие с id " + eventId + " не найдено"));
+        return eventService.getEventByUserIdAndEventId(userId, eventId, from, size, ip);
     }
 
     @GetMapping("/admin/events")
     public List<EventFullDto> getAdminEvents(
             @RequestParam(required = false) String text,
-            @RequestParam(required = false) List<Integer> categories,
+            @RequestParam(required = false) List<Long> categories,
             @RequestParam(required = false) Boolean paid,
             @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable,
             @RequestParam(required = false) String rangeStart,

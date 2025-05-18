@@ -1,8 +1,8 @@
 package ru.practicum.dto.event;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -17,7 +17,7 @@ public class NewEventDto {
     @NotBlank
     String annotation;
     @NotNull
-    int categoryId;
+    long categoryId;
     @NotBlank
     String description;
     @NotNull
