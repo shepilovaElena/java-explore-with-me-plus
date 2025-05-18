@@ -5,6 +5,7 @@ import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.Location;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.NewEventDto;
+import ru.practicum.user.UserService;
 
 @RequiredArgsConstructor
 public class EventDtoMapper {
