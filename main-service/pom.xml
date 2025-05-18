@@ -20,7 +20,6 @@
         <module>main-server</module>
     </modules>
 
-
     <name>Explore With Me - Main Service</name>
 
     <properties>

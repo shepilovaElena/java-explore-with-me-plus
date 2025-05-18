@@ -20,5 +20,4 @@ public class ErrorResponse {
         this.reason = reason;
         this.message = message;
         this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-    }
 }
