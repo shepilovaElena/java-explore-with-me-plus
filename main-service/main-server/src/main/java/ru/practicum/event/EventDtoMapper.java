@@ -2,17 +2,19 @@ package ru.practicum.event;
 
 import lombok.RequiredArgsConstructor;
 import ru.practicum.dto.event.EventFullDto;
-import ru.practicum.dto.event.Location;
 import ru.practicum.dto.event.EventShortDto;
+import ru.practicum.dto.event.Location;
 import ru.practicum.dto.event.NewEventDto;
-import ru.practicum.user.UserService;
+import ru.practicum.user.UserMapper;
+import ru.practicum.user.UserRepository;
 
 @RequiredArgsConstructor
 public class EventDtoMapper {
     static CategoryService categoryService;
-    static UserService userService;
+    static UserRepository userRepository;
+    static UserMapper userMapper;
 
-    public static Event mapToModel(NewEventDto dto, int userId) {
+    public static Event mapToModel(NewEventDto dto, long userId) {
         return Event.builder()
                 .initiatorId(userId)
                 .annotation(dto.getAnnotation())
@@ -35,9 +37,7 @@ public class EventDtoMapper {
                 .confirmedRequests(event.getConfirmedRequests())
                 .eventDate(event.getEventDate())
                 .id(event.getId())
-                .initiator(UserDtoMapper.mapToShortDto(
-                        userService.findUserById(
-                                event.getInitiatorId()).get()))
+                .initiator(userMapper.toUserShortDto(userRepository.findById(event.getInitiatorId()).get()))
                 .paid(event.getPaid())
                 .title(event.getTitle())
                 .views(event.getViews())
@@ -53,8 +53,8 @@ public class EventDtoMapper {
                 .createdOn(event.getCreatedOn())
                 .description(event.getDescription())
                 .eventDate(event.getEventDate())
-                .initiator(UserDtoMapper.mapToShortDto(
-                        userService.findUserById(
+                .initiator(userMapper.toUserShortDto(
+                        userRepository.findById(
                                 event.getInitiatorId()).get()))
                 .location(Location.builder()
                         .lat(event.getLocation_lat())

@@ -7,16 +7,16 @@ import org.springframework.stereotype.Service;
 import ru.practicum.EndpointHitDto;
 import ru.practicum.StatsClient;
 import ru.practicum.ViewStatsDto;
+import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
+import ru.practicum.dto.event.NewEventDto;
 import ru.practicum.dto.event.UpdatedEventDto;
 import ru.practicum.dto.event.enums.State;
 import ru.practicum.dto.event.enums.StateAction;
 import ru.practicum.error.BadRequestException;
 import ru.practicum.error.ConditionsNotMetException;
 import ru.practicum.error.NotFoundException;
-import ru.practicum.dto.event.EventFullDto;
-import ru.practicum.dto.event.NewEventDto;
-import ru.practicum.user.UserService;
+import ru.practicum.user.UserRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,16 +27,16 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final StatsClient statsClient;
-    private final CategoryService categoryService;
+    private final CategoryRepository categoryRepository;
 
-    public Optional<EventFullDto> saveEvent(NewEventDto newEventDto, int userId, String ip) {
-        if (userService.findById(userId).isEmpty()) {
+    public EventFullDto saveEvent(NewEventDto newEventDto, long userId, String ip) {
+        if (userRepository.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
-        if (categoryService.findById(newEventDto.getCategoryId()).isEmpty()) {
+        if (categoryRepository.findById(newEventDto.getCategoryId()).isEmpty()) {
             throw new NotFoundException("Категория с id " + newEventDto.getCategoryId() + " не найдена");
         }
         String uri = "/users/" + userId + "/events";
@@ -48,12 +48,12 @@ public class EventServiceImpl implements EventService {
                 .build());
         Event event = EventDtoMapper.mapToModel(newEventDto, userId);
         Event savedEvent = eventRepository.save(event);
-        return Optional.of(EventDtoMapper.mapToFullDto(savedEvent));
+        return EventDtoMapper.mapToFullDto(savedEvent);
     }
 
-    public Optional<EventFullDto> updateEvent(UpdatedEventDto updatedEvent,
-                                              int userId, int eventId, String ip) {
-        if (userService.findById(userId).isEmpty()) {
+    public EventFullDto updateEvent(UpdatedEventDto updatedEvent,
+                                              long userId, long eventId, String ip) {
+        if (userRepository.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
         Optional<Event> eventOpt = eventRepository.findById(eventId);
@@ -81,11 +81,11 @@ public class EventServiceImpl implements EventService {
         applyUpdate(event, updatedEvent);
         Event savedUpdatedEvent = eventRepository.save(event);
 
-        return Optional.of(EventDtoMapper.mapToFullDto(savedUpdatedEvent));
+        return EventDtoMapper.mapToFullDto(savedUpdatedEvent);
     }
 
-    public Optional<EventFullDto> updateAdminEvent(UpdatedEventDto updatedEvent,
-                                                   int eventId, String ip) {
+    public EventFullDto updateAdminEvent(UpdatedEventDto updatedEvent,
+                                                   long eventId, String ip) {
         Optional<Event> eventOpt = eventRepository.findById(eventId);
         if (eventOpt.isEmpty()) {
             throw new NotFoundException("Событие с id " + eventId + " не найдено");
@@ -119,10 +119,10 @@ public class EventServiceImpl implements EventService {
         applyUpdate(event, updatedEvent);
         Event savedUpdatedEvent = eventRepository.save(event);
 
-        return Optional.of(EventDtoMapper.mapToFullDto(savedUpdatedEvent));
+        return EventDtoMapper.mapToFullDto(savedUpdatedEvent);
     }
 
-    public List<EventFullDto> getEvents(String text, List<Integer> categories, boolean paid,
+    public List<EventFullDto> getEvents(String text, List<Long> categories, boolean paid,
                                         String rangeStart, String rangeEnd, boolean onlyAvailable,
                                         String sort, Integer from, Integer size, String ip, String user) {
         boolean isAdmin = !"user".equalsIgnoreCase(user);
@@ -178,8 +178,8 @@ public class EventServiceImpl implements EventService {
         return eventsWithViews;
     }
 
-    public List<EventShortDto> getEventsByUserId(int userId, Integer from, Integer size, String ip) {
-        if (userService.findById(userId).isEmpty()) {
+    public List<EventShortDto> getEventsByUserId(long userId, Integer from, Integer size, String ip) {
+        if (userRepository.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
         if (size != null & size < 0) {
@@ -213,9 +213,9 @@ public class EventServiceImpl implements EventService {
                 .toList();
     }
 
-    public Optional<EventShortDto> getEventByUserIdAndEventId(int userId, int eventId,
+    public EventShortDto getEventByUserIdAndEventId(long userId, long eventId,
                                                               Integer from, Integer size, String ip) {
-        if (userService.findById(userId).isEmpty()) {
+        if (userRepository.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
         String uri = "/users/" + userId + "/events/" + eventId;
@@ -228,14 +228,14 @@ public class EventServiceImpl implements EventService {
 
         Optional<Event> event = eventRepository.findByUserIdAndId(userId, eventId);
         if (event.isEmpty()) {
-            return Optional.empty();
+            return List.of();
         }
         EventShortDto eventShortDto = EventDtoMapper.mapToShortDto(event.get());
 
-        return Optional.of(eventShortDto);
+        return eventShortDto;
     }
 
-    public Optional<EventFullDto> getEventById(int id, String ip) {
+    public EventFullDto getEventById(long id, String ip) {
         String uri = "events/" + id;
         statsClient.saveHit(EndpointHitDto.builder()
                 .app("main-service")
@@ -252,7 +252,7 @@ public class EventServiceImpl implements EventService {
                 LocalDateTime.MIN, LocalDateTime.now(), List.of(uri), false);
         long views = statsList.isEmpty() ? 0L : statsList.getFirst().getHits();
         dto.setViews(views);
-        return Optional.of(dto);
+        return dto;
     }
 
     public void applyUpdate(Event event, UpdatedEventDto dto) {

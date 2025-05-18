@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface EventRepository extends JpaRepository<Event, Integer> {
+public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT e FROM Event e " +
             "WHERE (:text IS NULL OR LOWER(e.annotation) LIKE LOWER(CONCAT('%', :text, '%'))) " +
@@ -21,7 +21,7 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
             "AND (:onlyAvailable IS NULL OR e.participantLimit > 0)" +
             "AND (:isAdmin = TRUE OR e.requestModeration = FALSE)")
     Page<Event> getEvents(@Param("text") String text,
-                          @Param("categories") List<Integer> categories,
+                          @Param("categories") List<Long> categories,
                           @Param("paid") Boolean paid,
                           @Param("rangeStart") LocalDateTime rangeStart,
                           @Param("rangeEnd") LocalDateTime rangeEnd,
@@ -29,7 +29,7 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
                           @Param("isAdmin") Boolean isAdmin,
                           Pageable pageable);
 
-    List<Event> findAllByUserId(int userId, Pageable page);
+    List<Event> findAllByUserId(long userId, Pageable page);
 
-    Optional<Event> findByUserIdAndId(int userId, int eventId);
+    Optional<Event> findByUserIdAndId(long userId, long eventId);
 }

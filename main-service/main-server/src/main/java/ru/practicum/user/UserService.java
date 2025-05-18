@@ -1,5 +1,6 @@
 package ru.practicum.user;
 
+import ru.practicum.dto.user.UserDto;
 
 import java.util.List;
 
