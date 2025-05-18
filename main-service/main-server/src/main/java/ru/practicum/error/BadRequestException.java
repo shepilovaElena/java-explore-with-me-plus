@@ -1,0 +1,8 @@
+package ru.practicum.error;
+
+public class BadRequestException extends RuntimeException {
+
+    public BadRequestException(String text) {
+        super(text);
+    }
+}
