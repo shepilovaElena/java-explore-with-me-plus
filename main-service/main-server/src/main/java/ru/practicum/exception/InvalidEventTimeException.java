@@ -1,4 +1,4 @@
-package ru.practicum.error;
+package ru.practicum.exception;
 
 import lombok.Getter;
 
@@ -9,7 +9,7 @@ public class InvalidEventTimeException extends RuntimeException {
     private final LocalDateTime eventDate;
 
     public InvalidEventTimeException(LocalDateTime eventDate) {
-        super("Дата события невалидна: " + eventDate);
+        super("The event date is invalid.: " + eventDate);
         this.eventDate = eventDate;
     }
 
