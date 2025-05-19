@@ -1,9 +1,12 @@
 package ru.practicum.request;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.dto.request.EventRequestStatusUpdateRequest;
+import ru.practicum.dto.request.EventRequestStatusUpdateResult;
 import ru.practicum.dto.request.ParticipationRequestDto;
 
 import java.util.List;
@@ -35,6 +38,24 @@ public class RequestController {
         return requestService.cancelUserRequest(userId, requestId);
 
     }
+
+    @PatchMapping("/users/{userId}/events/{eventId}/requests")
+    @ResponseStatus(HttpStatus.OK)
+    public EventRequestStatusUpdateResult changeRequestStatus(@PathVariable Long userId,
+                                                              @PathVariable Long eventId,
+                                                              @Valid @RequestBody EventRequestStatusUpdateRequest request) {
+        return requestService.changeRequestStatus(userId, eventId, request);
+    }
+
+
+    @PatchMapping("/users/{userId}/events/{eventId}/requests")
+    @ResponseStatus(HttpStatus.OK)
+    public List<ParticipationRequestDto> getRequestByInitiator(@PathVariable Long userId,
+                                                         @PathVariable Long eventId) {
+        return requestService.getRequestByInitiator(userId, eventId);
+    }
+
+
 
 
 }
