@@ -7,11 +7,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.exception.BadRequestException;
-import ru.practicum.exception.ConflictPropertyConstraintException;
-import ru.practicum.exception.ConflictRelationsConstraintException;
-import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -42,12 +40,6 @@ public class ErrorHandlingControllerAdvice {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse onBadRequestException(BadRequestException e) {
-        return new ErrorResponse(HttpStatus.BAD_REQUEST, "Incorrectly made request.", e.getMessage());
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse onConflictPropertyConstraintException(ConflictPropertyConstraintException e) {
         return new ErrorResponse(HttpStatus.CONFLICT, "Integrity constraint has been violated.",
@@ -66,5 +58,18 @@ public class ErrorHandlingControllerAdvice {
     public ErrorResponse onNotFoundException(NotFoundException e) {
         return new ErrorResponse(HttpStatus.NOT_FOUND, "The required object was not found.",
                 e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBadEventTime(InvalidEventTimeException e) {
+        return new ErrorResponse(HttpStatus.BAD_REQUEST, "Validation error for event start time " + e.getEventDate() +
+                ": the event cannot start earlier than " + LocalDateTime.now().plusHours(2) + ".", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleConditionsNotMetException(ConditionsNotMetException e) {
+        return new ErrorResponse(HttpStatus.FORBIDDEN, "The publication condition has been violated.", e.getMessage());
     }
 }

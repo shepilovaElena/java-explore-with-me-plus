@@ -13,9 +13,9 @@ import ru.practicum.dto.event.NewEventDto;
 import ru.practicum.dto.event.UpdatedEventDto;
 import ru.practicum.dto.event.enums.State;
 import ru.practicum.dto.event.enums.StateAction;
-import ru.practicum.error.BadRequestException;
-import ru.practicum.error.ConditionsNotMetException;
-import ru.practicum.error.NotFoundException;
+import ru.practicum.exception.BadRequestException;
+import ru.practicum.exception.ConditionsNotMetException;
+import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.UserRepository;
 
 import java.time.LocalDateTime;
