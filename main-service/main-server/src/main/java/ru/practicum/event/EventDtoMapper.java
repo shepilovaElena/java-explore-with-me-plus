@@ -1,6 +1,7 @@
 package ru.practicum.event;
 
 import lombok.RequiredArgsConstructor;
+import ru.practicum.category.CategoryService;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.Location;
@@ -10,11 +11,12 @@ import ru.practicum.user.UserRepository;
 
 @RequiredArgsConstructor
 public class EventDtoMapper {
-    static CategoryService categoryService;
-    static UserRepository userRepository;
-    static UserMapper userMapper;
 
-    public static Event mapToModel(NewEventDto dto, long userId) {
+    private final CategoryService categoryService;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+
+    public Event mapToModel(NewEventDto dto, long userId) {
         return Event.builder()
                 .initiatorId(userId)
                 .annotation(dto.getAnnotation())
@@ -30,32 +32,36 @@ public class EventDtoMapper {
                 .build();
     }
 
-    public static EventShortDto mapToShortDto(Event event) {
+    public EventShortDto mapToShortDto(Event event) {
         return EventShortDto.builder()
                 .annotation(event.getAnnotation())
-                .category(categoryService.findById(event.getCategoryId()).get())
+                .category(categoryService.getById(event.getCategoryId())) // закрыта скобка
                 .confirmedRequests(event.getConfirmedRequests())
                 .eventDate(event.getEventDate())
                 .id(event.getId())
-                .initiator(userMapper.toUserShortDto(userRepository.findById(event.getInitiatorId()).get()))
+                .initiator(userMapper.toUserShortDto(
+                        userRepository.findById(event.getInitiatorId())
+                                .orElseThrow(() -> new RuntimeException("User not found"))
+                ))
                 .paid(event.getPaid())
                 .title(event.getTitle())
                 .views(event.getViews())
                 .build();
     }
 
-    public static EventFullDto mapToFullDto(Event event) {
+    public EventFullDto mapToFullDto(Event event) {
         return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
-                .category(categoryService.findById(event.getCategoryId()).get())
+                .category(categoryService.getById(event.getCategoryId())) // закрыта скобка
                 .confirmedRequests(event.getConfirmedRequests())
                 .createdOn(event.getCreatedOn())
                 .description(event.getDescription())
                 .eventDate(event.getEventDate())
                 .initiator(userMapper.toUserShortDto(
-                        userRepository.findById(
-                                event.getInitiatorId()).get()))
+                        userRepository.findById(event.getInitiatorId())
+                                .orElseThrow(() -> new RuntimeException("User not found"))
+                ))
                 .location(Location.builder()
                         .lat(event.getLocation_lat())
                         .lon(event.getLocation_lon())
