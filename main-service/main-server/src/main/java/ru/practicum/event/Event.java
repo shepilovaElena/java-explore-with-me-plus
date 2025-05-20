@@ -8,7 +8,8 @@ import ru.practicum.dto.event.enums.State;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor // чтобы Hibernate мог создать объект
 @AllArgsConstructor // чтобы Builder работы при NoArgsConstructor

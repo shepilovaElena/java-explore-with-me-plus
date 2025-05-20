@@ -1,6 +1,8 @@
 package ru.practicum.event;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import ru.practicum.category.CategoryService;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.Location;
@@ -8,13 +10,15 @@ import ru.practicum.dto.event.NewEventDto;
 import ru.practicum.user.UserMapper;
 import ru.practicum.user.UserRepository;
 
+@Component
 @RequiredArgsConstructor
 public class EventDtoMapper {
-    static CategoryService categoryService;
-    static UserRepository userRepository;
-    static UserMapper userMapper;
 
-    public static Event mapToModel(NewEventDto dto, long userId) {
+    private final CategoryService categoryService;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+
+    public Event mapToModel(NewEventDto dto, long userId) {
         return Event.builder()
                 .initiatorId(userId)
                 .annotation(dto.getAnnotation())
@@ -30,38 +34,42 @@ public class EventDtoMapper {
                 .build();
     }
 
-    public static EventShortDto mapToShortDto(Event event) {
+    public EventShortDto mapToShortDto(Event event) {
         return EventShortDto.builder()
                 .annotation(event.getAnnotation())
-                .category(categoryService.findById(event.getCategoryId()).get())
-                .confirmedRequests(event.getConfirmedRequests())
+                .category(categoryService.getById(event.getCategoryId()))
+                .confirmedRequests((int) event.getConfirmedRequests())
                 .eventDate(event.getEventDate())
-                .id(event.getId())
-                .initiator(userMapper.toUserShortDto(userRepository.findById(event.getInitiatorId()).get()))
+                .id((int) event.getId())
+                .initiator(userMapper.toUserShortDto(
+                        userRepository.findById(event.getInitiatorId())
+                                .orElseThrow(() -> new RuntimeException("User not found"))
+                ))
                 .paid(event.getPaid())
                 .title(event.getTitle())
                 .views(event.getViews())
                 .build();
     }
 
-    public static EventFullDto mapToFullDto(Event event) {
+    public EventFullDto mapToFullDto(Event event) {
         return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
-                .category(categoryService.findById(event.getCategoryId()).get())
-                .confirmedRequests(event.getConfirmedRequests())
+                .category(categoryService.getById(event.getCategoryId()))
+                .confirmedRequests((int) event.getConfirmedRequests())
                 .createdOn(event.getCreatedOn())
                 .description(event.getDescription())
                 .eventDate(event.getEventDate())
                 .initiator(userMapper.toUserShortDto(
-                        userRepository.findById(
-                                event.getInitiatorId()).get()))
+                        userRepository.findById(event.getInitiatorId())
+                                .orElseThrow(() -> new RuntimeException("User not found"))
+                ))
                 .location(Location.builder()
-                        .lat(event.getLocation_lat())
-                        .lon(event.getLocation_lon())
+                        .lat((float) event.getLocation_lat())
+                        .lon((float) event.getLocation_lon())
                         .build())
                 .paid(event.getPaid())
-                .participantLimit(event.getParticipantLimit())
+                .participantLimit((int) event.getParticipantLimit())
                 .publishedOn(event.getPublishedOn())
                 .requestModeration(event.getRequestModeration())
                 .state(event.getState())

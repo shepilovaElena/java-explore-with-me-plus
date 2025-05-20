@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-public class Location { // заглушка
+public class Location {
     float lat;
     float lon;
 }

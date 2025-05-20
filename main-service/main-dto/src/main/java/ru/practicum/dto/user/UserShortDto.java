@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 public class UserShortDto {
     @NotNull
-    int id;
+    Long id;
     @NotBlank
     String name;
 }

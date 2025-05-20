@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.user.UserDto;
+import ru.practicum.dto.user.UserShortDto;
 import ru.practicum.exception.ConflictPropertyConstraintException;
 import ru.practicum.exception.NotFoundException;
 
@@ -51,5 +52,15 @@ public class UserServiceImpl implements UserService {
         if (userOptional.isEmpty()) {
             throw new NotFoundException("Пользователь с id " + id + " не найден.");
         }
+    }
+
+    @Override
+    public UserShortDto getUserShortById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        return UserShortDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .build();
     }
 }
