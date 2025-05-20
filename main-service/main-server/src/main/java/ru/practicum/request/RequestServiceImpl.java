@@ -202,7 +202,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     private void checkInitiatorEvent(Long initiatorId, Long eventId) {
-        eventRepository.findByUserIdAndId(initiatorId, eventId).orElseThrow(
+        eventRepository.findByInitiatorIdAndId(initiatorId, eventId).orElseThrow(
                 () -> new NotFoundException(
                         "У пользователя с id " + initiatorId + " не найдено событие с id " + eventId)
         );

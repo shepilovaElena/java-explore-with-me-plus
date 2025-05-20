@@ -29,7 +29,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                           @Param("isAdmin") Boolean isAdmin,
                           Pageable pageable);
 
-    List<Event> findAllByUserId(long userId, Pageable page);
+    List<Event> findAllByInitiatorId(long userId, Pageable page);
 
-    Optional<Event> findByUserIdAndId(long userId, long eventId);
+    Optional<Event> findByInitiatorIdAndId(long userId, long eventId);
 }

@@ -48,7 +48,7 @@ public class RequestController {
     }
 
 
-    @PatchMapping("/users/{userId}/events/{eventId}/requests")
+    @GetMapping("/users/{userId}/events/{eventId}/requests")
     @ResponseStatus(HttpStatus.OK)
     public List<ParticipationRequestDto> getRequestByInitiator(@PathVariable Long userId,
                                                          @PathVariable Long eventId) {
