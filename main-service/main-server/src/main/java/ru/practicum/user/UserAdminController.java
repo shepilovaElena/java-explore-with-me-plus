@@ -1,8 +1,12 @@
 package ru.practicum.user;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.dto.user.UserCreateDto;
 import ru.practicum.dto.user.UserDto;
 
 import java.util.List;
@@ -10,13 +14,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/users")
 @RequiredArgsConstructor
+@Validated
 public class UserAdminController {
     private final UserServiceImpl userService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto postUser(UserDto userDto) {
-        return userService.createUser(userDto);
+    public UserDto postUser(@RequestBody
+                            @Valid
+                            @NotNull
+                            UserCreateDto userCreateDto) {
+        return userService.createUser(userCreateDto);
     }
 
     @GetMapping
@@ -29,7 +37,9 @@ public class UserAdminController {
 
     @DeleteMapping("/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUserById(@PathVariable Long userId) {
-
+    public void deleteUserById(@PathVariable
+                               @NotNull
+                               Long userId) {
+        userService.deleteUserById(userId);
     }
 }

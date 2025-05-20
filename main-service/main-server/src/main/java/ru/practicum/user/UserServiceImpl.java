@@ -1,11 +1,13 @@
 package ru.practicum.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.dto.user.UserCreateDto;
 import ru.practicum.dto.user.UserDto;
 import ru.practicum.dto.user.UserShortDto;
 import ru.practicum.exception.ConflictPropertyConstraintException;
@@ -18,14 +20,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    @Autowired
     private final UserMapper userMapper;
 
-    public UserDto createUser(UserDto userDto) {
-        if (userRepository.existsByEmail(userDto.getEmail())) {
+    public UserDto createUser(UserCreateDto userCreateDto) {
+        if (userRepository.existsByEmail(userCreateDto.getEmail())) {
             throw new ConflictPropertyConstraintException(String.format("Email %s уже зарегистрирован ",
-                    userDto.getEmail()));
+                    userCreateDto.getEmail()));
         }
-        final User user = userMapper.toUser(userDto);
+        final User user = userMapper.toUser(userCreateDto);
         return userMapper.toUserDto(userRepository.save(user));
     }
 
@@ -58,9 +61,6 @@ public class UserServiceImpl implements UserService {
     public UserShortDto getUserShortById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-        return UserShortDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .build();
+        return userMapper.toUserShortDto(user);
     }
 }
