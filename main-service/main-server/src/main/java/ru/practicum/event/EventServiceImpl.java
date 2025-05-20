@@ -32,6 +32,7 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final StatsClient statsClient;
     private final CategoryRepository categoryRepository;
+    private final EventDtoMapper eventDtoMapper;
 
     public EventFullDto saveEvent(NewEventDto newEventDto, long userId, String ip) {
         if (userRepository.findById(userId).isEmpty()) {
@@ -47,9 +48,9 @@ public class EventServiceImpl implements EventService {
                 .uri(uri)
                 .timestamp(LocalDateTime.now())
                 .build());
-        Event event = EventDtoMapper.mapToModel(newEventDto, userId);
+        Event event = eventDtoMapper.mapToModel(newEventDto, userId);
         Event savedEvent = eventRepository.save(event);
-        return EventDtoMapper.mapToFullDto(savedEvent);
+        return eventDtoMapper.mapToFullDto(savedEvent);
     }
 
     public EventFullDto updateEvent(UpdatedEventDto updatedEvent,
@@ -82,7 +83,7 @@ public class EventServiceImpl implements EventService {
         applyUpdate(event, updatedEvent);
         Event savedUpdatedEvent = eventRepository.save(event);
 
-        return EventDtoMapper.mapToFullDto(savedUpdatedEvent);
+        return eventDtoMapper.mapToFullDto(savedUpdatedEvent);
     }
 
     public EventFullDto updateAdminEvent(UpdatedEventDto updatedEvent,
@@ -120,7 +121,7 @@ public class EventServiceImpl implements EventService {
         applyUpdate(event, updatedEvent);
         Event savedUpdatedEvent = eventRepository.save(event);
 
-        return EventDtoMapper.mapToFullDto(savedUpdatedEvent);
+        return eventDtoMapper.mapToFullDto(savedUpdatedEvent);
     }
 
     public List<EventFullDto> getEvents(String text, List<Long> categories, boolean paid,
@@ -156,7 +157,7 @@ public class EventServiceImpl implements EventService {
                         start, end, onlyAvailable,
                         isAdmin, page)
                 .stream()
-                .map(EventDtoMapper::mapToFullDto)
+                .map(eventDtoMapper::mapToFullDto)
                 .toList();
 
         List<EventFullDto> eventsWithViews = events.stream()
@@ -210,12 +211,12 @@ public class EventServiceImpl implements EventService {
                             return e;
                         }
                 )
-                .map(EventDtoMapper::mapToShortDto)
+                .map(eventDtoMapper::mapToShortDto)
                 .toList();
     }
 
     public EventShortDto getEventByUserIdAndEventId(long userId, long eventId,
-                                                              Integer from, Integer size, String ip) {
+                                                    Integer from, Integer size, String ip) {
         if (userRepository.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
@@ -227,13 +228,11 @@ public class EventServiceImpl implements EventService {
                 .timestamp(LocalDateTime.now())
                 .build());
 
-        Optional<Event> event = eventRepository.findByUserIdAndId(userId, eventId);
-        if (event.isEmpty()) {
-            return List.of();
+        Optional<Event> eventOpt = eventRepository.findByUserIdAndId(userId, eventId);
+        if (eventOpt.isEmpty()) {
+            throw new NotFoundException("Событие с id " + eventId + " не найдено для пользователя " + userId);
         }
-        EventShortDto eventShortDto = EventDtoMapper.mapToShortDto(event.get());
-
-        return eventShortDto;
+        return eventDtoMapper.mapToShortDto(eventOpt.get());
     }
 
     public EventFullDto getEventById(long id, String ip) {
@@ -244,14 +243,14 @@ public class EventServiceImpl implements EventService {
                 .uri(uri)
                 .timestamp(LocalDateTime.now())
                 .build());
-        Optional<Event> event = eventRepository.findById(id);
-        if (event.isEmpty()) {
-            return Optional.empty();
+        Optional<Event> eventOpt = eventRepository.findById(id);
+        if (eventOpt.isEmpty()) {
+            throw new NotFoundException("Событие с id " + id + " не найдено");
         }
-        EventFullDto dto = EventDtoMapper.mapToFullDto(event.get());
+        EventFullDto dto = eventDtoMapper.mapToFullDto(eventOpt.get());
         List<ViewStatsDto> statsList = statsClient.getStats(
                 LocalDateTime.MIN, LocalDateTime.now(), List.of(uri), false);
-        long views = statsList.isEmpty() ? 0L : statsList.getFirst().getHits();
+        long views = statsList.isEmpty() ? 0L : statsList.get(0).getHits();
         dto.setViews(views);
         return dto;
     }

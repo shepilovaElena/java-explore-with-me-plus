@@ -41,23 +41,23 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void delete(Long CatId) {
-        Category category = repository.findById(CatId)
+    public void delete(Long catId) {
+        Category category = repository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
         repository.delete(category);
     }
 
     @Override
     public List<CategoryDto> getAll(int from, int size) {
-        PageRequest page = PageRequest.of(from / size, size);
+        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
         return repository.findAll(page)
                 .map(mapper::toDto)
                 .getContent();
     }
 
     @Override
-    public CategoryDto getById(Long CatId) {
-        Category category = repository.findById(CatId)
+    public CategoryDto getById(Long catId) {
+        Category category = repository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
         return mapper.toDto(category);
     }

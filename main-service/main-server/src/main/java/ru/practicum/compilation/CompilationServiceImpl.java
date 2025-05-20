@@ -8,11 +8,12 @@ import ru.practicum.dto.compilation.CompilationDto;
 import ru.practicum.dto.compilation.NewCompilationDto;
 import ru.practicum.dto.compilation.UpdateCompilationRequest;
 import ru.practicum.dto.event.EventShortDto;
+import ru.practicum.event.Event;
 import ru.practicum.event.EventRepository;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.UserService;
 
-import java.awt.*;
+import java.util.List;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -97,7 +98,7 @@ public class CompilationServiceImpl implements CompilationService {
     private List<EventShortDto> mapToShortDtos(Collection<Event> events) {
         return events.stream()
                 .map(event -> EventShortDto.builder()
-                        .id(event.getId()) // уже Long
+                        .id((int) event.getId()) // уже Long
                         .annotation(event.getAnnotation())
                         .title(event.getTitle())
                         .eventDate(event.getEventDate())

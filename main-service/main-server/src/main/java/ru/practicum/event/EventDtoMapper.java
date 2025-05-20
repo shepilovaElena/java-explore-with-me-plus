@@ -1,6 +1,7 @@
 package ru.practicum.event;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import ru.practicum.category.CategoryService;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
@@ -9,6 +10,7 @@ import ru.practicum.dto.event.NewEventDto;
 import ru.practicum.user.UserMapper;
 import ru.practicum.user.UserRepository;
 
+@Component
 @RequiredArgsConstructor
 public class EventDtoMapper {
 
@@ -35,10 +37,10 @@ public class EventDtoMapper {
     public EventShortDto mapToShortDto(Event event) {
         return EventShortDto.builder()
                 .annotation(event.getAnnotation())
-                .category(categoryService.getById(event.getCategoryId())) // закрыта скобка
-                .confirmedRequests(event.getConfirmedRequests())
+                .category(categoryService.getById(event.getCategoryId()))
+                .confirmedRequests((int) event.getConfirmedRequests())
                 .eventDate(event.getEventDate())
-                .id(event.getId())
+                .id((int) event.getId())
                 .initiator(userMapper.toUserShortDto(
                         userRepository.findById(event.getInitiatorId())
                                 .orElseThrow(() -> new RuntimeException("User not found"))
@@ -53,8 +55,8 @@ public class EventDtoMapper {
         return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
-                .category(categoryService.getById(event.getCategoryId())) // закрыта скобка
-                .confirmedRequests(event.getConfirmedRequests())
+                .category(categoryService.getById(event.getCategoryId()))
+                .confirmedRequests((int) event.getConfirmedRequests())
                 .createdOn(event.getCreatedOn())
                 .description(event.getDescription())
                 .eventDate(event.getEventDate())
@@ -63,11 +65,11 @@ public class EventDtoMapper {
                                 .orElseThrow(() -> new RuntimeException("User not found"))
                 ))
                 .location(Location.builder()
-                        .lat(event.getLocation_lat())
-                        .lon(event.getLocation_lon())
+                        .lat((float) event.getLocation_lat())
+                        .lon((float) event.getLocation_lon())
                         .build())
                 .paid(event.getPaid())
-                .participantLimit(event.getParticipantLimit())
+                .participantLimit((int) event.getParticipantLimit())
                 .publishedOn(event.getPublishedOn())
                 .requestModeration(event.getRequestModeration())
                 .state(event.getState())
