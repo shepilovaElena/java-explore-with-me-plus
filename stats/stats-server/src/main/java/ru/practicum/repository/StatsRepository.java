@@ -14,7 +14,7 @@ public interface StatsRepository extends JpaRepository<EndpointHit, Long> {
     //Подсчитывает общее количество запросов по каждому app и uri, учитывая все IP-адреса.
     //Фильтрует по временному интервалу и по списку URI (если передан).
     //Сортирует по убыванию количества запросов.
-    @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app, h.uri, COUNT(h.ip)) " +
+    @Query("SELECT new ru.practicum.ViewStatsDto(h.app, h.uri, COUNT(h.ip)) " +
             "FROM EndpointHit h " +
             "WHERE h.timepoint BETWEEN :start AND :end " +
             "AND (:uris IS NULL OR h.uri IN :uris) " +
@@ -25,7 +25,7 @@ public interface StatsRepository extends JpaRepository<EndpointHit, Long> {
     //Подсчитывает количество уникальных IP-адресов по каждому app и uri.
     //Фильтрует по временному интервалу и по списку URI (если передан).
     //Сортирует по убыванию количества уникальных пользователей.
-    @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app, h.uri, COUNT(DISTINCT h.ip)) " +
+    @Query("SELECT new ru.practicum.ViewStatsDto(h.app, h.uri, COUNT(DISTINCT h.ip)) " +
             "FROM EndpointHit h " +
             "WHERE h.timepoint BETWEEN :start AND :end " +
             "AND (:uris IS NULL OR h.uri IN :uris) " +
