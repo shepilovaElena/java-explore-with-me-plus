@@ -199,7 +199,7 @@ public class EventServiceImpl implements EventService {
         int safeFrom = (from != null) ? from : 0;
         int safeSize = (size != null) ? size : 10;
         PageRequest page = PageRequest.of(safeFrom / safeSize, safeSize);
-        List<Event> userEvents = eventRepository.findAllByUserId(userId, page);
+        List<Event> userEvents = eventRepository.findAllByInitiatorId(userId, page);
 
         return userEvents.stream()
                 .map(e -> {
@@ -228,7 +228,7 @@ public class EventServiceImpl implements EventService {
                 .timestamp(LocalDateTime.now())
                 .build());
 
-        Optional<Event> eventOpt = eventRepository.findByUserIdAndId(userId, eventId);
+        Optional<Event> eventOpt = eventRepository.findByInitiatorIdAndId(userId, eventId);
         if (eventOpt.isEmpty()) {
             throw new NotFoundException("Событие с id " + eventId + " не найдено для пользователя " + userId);
         }

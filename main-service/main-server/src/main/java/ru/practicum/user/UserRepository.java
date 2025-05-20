@@ -8,7 +8,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import java.util.List;
 
 
-public interface UserRepository extends JpaRepository<User, Long>, QuerydslPredicateExecutor<User> {
+public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     Page<User> findAllByIdIn(List<Long> ids, Pageable pageable);
