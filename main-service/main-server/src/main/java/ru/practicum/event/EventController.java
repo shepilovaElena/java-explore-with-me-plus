@@ -3,6 +3,7 @@ package ru.practicum.event;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
@@ -14,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
+@Slf4j
 public class EventController {
     private final EventService eventService;
 
@@ -22,6 +24,7 @@ public class EventController {
                                   @PathVariable(name = "userId") Long userId,
                                   HttpServletRequest request) {
         String ip = request.getRemoteAddr();
+        log.info("Получен запрос на создание события от пользователя с ID {}, IP: {}", userId, ip);
         return eventService.saveEvent(newEventDto, userId, ip);
     }
 
@@ -31,6 +34,7 @@ public class EventController {
                                                  @PathVariable Long eventId,
                                                  HttpServletRequest request) {
         String ip = request.getRemoteAddr();
+        log.info("PATCH /users/{}/events/{} from IP {}", userId, eventId, ip);
         return eventService.updateEvent(updatedEventDto, userId, eventId, ip);
     }
 
@@ -39,12 +43,14 @@ public class EventController {
                                                  @PathVariable Long eventId,
                                                  HttpServletRequest request) {
         String ip = request.getRemoteAddr();
+        log.info("PATCH /admin/events/{} from IP {}", eventId, ip);
         return eventService.updateAdminEvent(updatedEventDto, eventId, ip);
     }
 
     @GetMapping("/events/{id}")
     public EventFullDto getEventById(@PathVariable Long id, HttpServletRequest request) {
         String ip = request.getRemoteAddr();
+        log.info("GET /events/{} from IP {}", id, ip);
         return eventService.getEventById(id, ip);
     }
 
@@ -62,6 +68,8 @@ public class EventController {
             HttpServletRequest request
     ) {
         String ip = request.getRemoteAddr();
+        log.info("GET /events from IP {}, params: text={}, categories={}, paid={}, rangeStart={}, rangeEnd={}, sort={}, from={}, size={}",
+                ip, text, categories, paid, rangeStart, rangeEnd, sort, from, size);
         return eventService.getEvents(text, categories, paid,
                                         rangeStart, rangeEnd,
                                         onlyAvailable, sort, from, size,
@@ -73,6 +81,7 @@ public class EventController {
                                                  @RequestParam(required = false) Integer from,
                                                  @RequestParam(required = false) Integer size) {
         String ip = request.getRemoteAddr();
+        log.info("GET /users/{}/events from IP {}, from={}, size={}", userId, ip, from, size);
         return eventService.getEventsByUserId(userId, from, size, ip);
     }
 
@@ -83,6 +92,7 @@ public class EventController {
                                                           @RequestParam(required = false) Integer from,
                                                           @RequestParam(required = false) Integer size) {
         String ip = request.getRemoteAddr();
+        log.info("GET /users/{}/events/{} from IP {}, from={}, size={}", userId, eventId, ip, from, size);
         return eventService.getEventByUserIdAndEventId(userId, eventId, from, size, ip);
     }
 
@@ -100,6 +110,8 @@ public class EventController {
             HttpServletRequest request
     ) {
         String ip = request.getRemoteAddr();
+        log.info("GET /admin/events from IP {}, params: text={}, categories={}, paid={}, rangeStart={}, rangeEnd={}, sort={}, from={}, size={}",
+                ip, text, categories, paid, rangeStart, rangeEnd, sort, from, size);
         return eventService.getEvents(text, categories, paid,
                 rangeStart, rangeEnd,
                 onlyAvailable, sort, from, size,

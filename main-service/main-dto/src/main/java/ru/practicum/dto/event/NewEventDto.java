@@ -1,6 +1,8 @@
 package ru.practicum.dto.event;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -28,7 +30,8 @@ public class NewEventDto {
     LocalDateTime eventDate;
     @NotNull
     Location location;
-    Boolean paid;
+    @JsonSetter(nulls = Nulls.SKIP) // если поле null, то
+    Boolean paid = false; // по умолчанию false
     int participantLimit;
     Boolean requestModeration;
     @NotBlank
