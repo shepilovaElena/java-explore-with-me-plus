@@ -34,15 +34,18 @@ public class Event {
     @Column(columnDefinition = "TEXT")
     String description;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "event_date")
     LocalDateTime eventDate;
     @Column(name = "initiator_id")
     long initiatorId;
     float location_lat;
     float location_lon;
     Boolean paid;
+    @Column(name = "participant_limit")
     long participantLimit;
     @Column(name = "published_on")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "published_on")
     LocalDateTime publishedOn;
     @Column(name = "request_moderation")
     Boolean requestModeration;
