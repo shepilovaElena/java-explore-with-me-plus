@@ -20,7 +20,6 @@ import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.UserRepository;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -154,7 +153,9 @@ public class EventServiceImpl implements EventService {
                 ? null
                 : LocalDateTime.parse(rangeEnd);
 
-        List<EventFullDto> events = eventRepository.getEvents(text, categories, paid,
+        List<Long> allowedEventIds = categoryRepository.findEventIdsByCategoryIds(categories);
+
+        List<EventFullDto> events = eventRepository.getEvents(text, allowedEventIds, paid,
                         start, end, onlyAvailable,
                         isAdmin, page)
                 .stream()
@@ -172,7 +173,7 @@ public class EventServiceImpl implements EventService {
                     }
                 ).toList();
 
-        if (sort.equals("VIEWS")) {
+        if (sort != null && sort.equals("VIEWS")) {
             return events.stream()
                     .sorted(Comparator.comparing(EventFullDto::getViews))
                     .toList();

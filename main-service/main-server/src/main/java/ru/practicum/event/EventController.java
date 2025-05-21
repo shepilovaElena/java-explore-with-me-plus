@@ -21,9 +21,6 @@ public class EventController {
     public EventFullDto saveEvent(@Valid @RequestBody NewEventDto newEventDto,
                                   @PathVariable(name = "userId") Long userId,
                                   HttpServletRequest request) {
-//        if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-//            throw new InvalidEventTimeException(newEventDto.getEventDate());
-//        }
         String ip = request.getRemoteAddr();
         return eventService.saveEvent(newEventDto, userId, ip);
     }
