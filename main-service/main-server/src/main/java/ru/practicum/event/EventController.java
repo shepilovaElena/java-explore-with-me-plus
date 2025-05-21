@@ -73,8 +73,8 @@ public class EventController {
 
     @GetMapping("/users/{userId}/events")
     public List<EventShortDto> getEventsByUserId(@PathVariable Long userId, HttpServletRequest request,
-                                                 @RequestParam(required = false) int from,
-                                                 @RequestParam(required = false) int size) {
+                                                 @RequestParam(required = false) Integer from,
+                                                 @RequestParam(required = false) Integer size) {
         String ip = request.getRemoteAddr();
         return eventService.getEventsByUserId(userId, from, size, ip);
     }
@@ -83,8 +83,8 @@ public class EventController {
     public EventShortDto getEventByUserIdAndEventId(@PathVariable Long userId,
                                                           @PathVariable Long eventId,
                                                           HttpServletRequest request,
-                                                          @RequestParam(required = false) int from,
-                                                          @RequestParam(required = false) int size) {
+                                                          @RequestParam(required = false) Integer from,
+                                                          @RequestParam(required = false) Integer size) {
         String ip = request.getRemoteAddr();
         return eventService.getEventByUserIdAndEventId(userId, eventId, from, size, ip);
     }

@@ -11,8 +11,8 @@ public interface EventService {
 
     EventFullDto saveEvent(NewEventDto newEventDto, long userId, String ip);
 
-    List<EventFullDto> getEvents(String text, List<Long> categories, boolean paid,
-                                 String rangeStart, String rangeEnd, boolean onlyAvailable,
+    List<EventFullDto> getEvents(String text, List<Long> categories, Boolean paid,
+                                 String rangeStart, String rangeEnd, Boolean onlyAvailable,
                                  String sort, Integer from, Integer size,
                                  String ip, String user);
 

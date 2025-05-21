@@ -124,8 +124,8 @@ public class EventServiceImpl implements EventService {
         return eventDtoMapper.mapToFullDto(savedUpdatedEvent);
     }
 
-    public List<EventFullDto> getEvents(String text, List<Long> categories, boolean paid,
-                                        String rangeStart, String rangeEnd, boolean onlyAvailable,
+    public List<EventFullDto> getEvents(String text, List<Long> categories, Boolean paid,
+                                        String rangeStart, String rangeEnd, Boolean onlyAvailable,
                                         String sort, Integer from, Integer size, String ip, String user) {
         boolean isAdmin = !"user".equalsIgnoreCase(user);
         String uri = isAdmin ? "/admin/events" : "/events";
@@ -136,10 +136,12 @@ public class EventServiceImpl implements EventService {
                 .timestamp(LocalDateTime.now())
                 .build());
 
-        Sort sortParam = switch (sort) {
-            case "EVENT_DATE" -> Sort.by("eventDate").ascending();
-            default -> Sort.unsorted();
-        };
+        Sort sortParam;
+        if (sort != null && sort.equals("EVENT_DATE")) {
+            sortParam = Sort.by("eventDate").ascending();
+        } else {
+            sortParam = Sort.unsorted();
+        }
         int safeFrom = (from != null) ? from : 0;
         int safeSize = (size != null) ? size : 10;
         PageRequest page = PageRequest.of(safeFrom / safeSize, safeSize, sortParam);
@@ -147,11 +149,10 @@ public class EventServiceImpl implements EventService {
             rangeStart = LocalDateTime.now().toString();
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime start = LocalDateTime.parse(rangeStart, formatter);
+        LocalDateTime start = LocalDateTime.parse(rangeStart);
         LocalDateTime end = (rangeEnd == null || rangeEnd.isBlank())
                 ? null
-                : LocalDateTime.parse(rangeEnd, formatter);
+                : LocalDateTime.parse(rangeEnd);
 
         List<EventFullDto> events = eventRepository.getEvents(text, categories, paid,
                         start, end, onlyAvailable,
@@ -184,7 +185,7 @@ public class EventServiceImpl implements EventService {
         if (userRepository.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
-        if (size != null & size < 0) {
+        if (size != null && size < 0) {
             throw new BadRequestException("Некорректный запрос: размер возвращаемого списка отрицательный");
         }
         String uri = "/users/" + userId + "/events";
