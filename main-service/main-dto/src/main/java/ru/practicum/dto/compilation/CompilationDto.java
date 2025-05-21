@@ -16,7 +16,7 @@ public class CompilationDto {
 
     Long id;
 
-    String name;
+    String title;
 
     Boolean pinned;
 

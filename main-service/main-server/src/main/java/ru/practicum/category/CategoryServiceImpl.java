@@ -10,20 +10,21 @@ import ru.practicum.exception.NotFoundException;
 
 import java.util.List;
 
+import static ru.practicum.category.CategoryMapperCustom.*;
+
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository repository;
-    private final CategoryMapper mapper;
 
     @Override
     public CategoryDto create(NewCategoryDto dto) {
         if (repository.existsByName(dto.getName())) {
-            throw new ConflictException("Category with name alredy exists");
+            throw new ConflictException("Category with name already exists");
         }
-        Category category = mapper.toEntity(dto);
-        return mapper.toDto(repository.save(category));
+        Category category = toEntity(dto);
+        return toDto(repository.save(category));
     }
 
     @Override
@@ -37,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         category.setName(dto.getName());
-        return mapper.toDto(repository.save(category));
+        return toDto(repository.save(category));
     }
 
     @Override
@@ -51,7 +52,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryDto> getAll(int from, int size) {
         PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
         return repository.findAll(page)
-                .map(mapper::toDto)
+                .map(CategoryMapperCustom::toDto)
                 .getContent();
     }
 
@@ -59,16 +60,13 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto getById(Long catId) {
         Category category = repository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
-        return mapper.toDto(category);
+        return toDto(category);
     }
 
     @Override
     public CategoryDto getCategoryDtoById(Long id) {
         Category category = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
-        return CategoryDto.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .build();
+        return toDto(category);
     }
 }

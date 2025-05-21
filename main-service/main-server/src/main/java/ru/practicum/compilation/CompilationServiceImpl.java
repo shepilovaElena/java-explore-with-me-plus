@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class CompilationServiceImpl implements CompilationService {
 
     private final CompilationRepository compilationRepository;
-    private final CompilationMapper mapper;
+    private final CompilationMapperCustom mapper;
     private final EventRepository eventRepository;
     private final UserService userService;
     private final CategoryService categoryService;

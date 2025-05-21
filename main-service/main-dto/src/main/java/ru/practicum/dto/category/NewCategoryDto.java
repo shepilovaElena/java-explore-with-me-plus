@@ -12,6 +12,6 @@ import lombok.*;
 public class NewCategoryDto {
 
     @NotBlank
-    @Size(min = 1, max = 64, message = "Category name must be 1 to 64 characters")
+    @Size(min = 1, max = 50, message = "Category name must be 1 to 50 characters")
     private String name;
 }
