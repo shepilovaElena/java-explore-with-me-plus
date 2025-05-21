@@ -7,7 +7,7 @@ import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.Location;
 import ru.practicum.dto.event.NewEventDto;
-import ru.practicum.user.UserMapper;
+import ru.practicum.user.UserMapperCustom;
 import ru.practicum.user.UserRepository;
 
 @Component
@@ -16,7 +16,6 @@ public class EventDtoMapper {
 
     private final CategoryService categoryService;
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
 
     public Event mapToModel(NewEventDto dto, long userId) {
         return Event.builder()
@@ -41,7 +40,7 @@ public class EventDtoMapper {
                 .confirmedRequests((int) event.getConfirmedRequests())
                 .eventDate(event.getEventDate())
                 .id((int) event.getId())
-                .initiator(userMapper.toUserShortDto(
+                .initiator(UserMapperCustom.toUserShortDto(
                         userRepository.findById(event.getInitiatorId())
                                 .orElseThrow(() -> new RuntimeException("User not found"))
                 ))
@@ -60,7 +59,7 @@ public class EventDtoMapper {
                 .createdOn(event.getCreatedOn())
                 .description(event.getDescription())
                 .eventDate(event.getEventDate())
-                .initiator(userMapper.toUserShortDto(
+                .initiator(UserMapperCustom.toUserShortDto(
                         userRepository.findById(event.getInitiatorId())
                                 .orElseThrow(() -> new RuntimeException("User not found"))
                 ))

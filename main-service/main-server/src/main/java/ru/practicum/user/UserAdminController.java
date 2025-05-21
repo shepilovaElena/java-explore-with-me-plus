@@ -29,10 +29,10 @@ public class UserAdminController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDto> getUsers(@RequestParam List<Long> usersIdList,
+    public List<UserDto> getUsers(@RequestParam(required = false) List<Long> ids,
                                   @RequestParam(defaultValue = "0") Integer from,
                                   @RequestParam(defaultValue = "10") Integer size) {
-        return userService.getUsers(usersIdList,from, size);
+        return userService.getUsers(ids, from, size);
     }
 
     @DeleteMapping("/{userId}")

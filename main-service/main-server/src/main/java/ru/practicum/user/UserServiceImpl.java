@@ -1,7 +1,6 @@
 package ru.practicum.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,22 +13,19 @@ import ru.practicum.exception.ConflictPropertyConstraintException;
 import ru.practicum.exception.NotFoundException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    @Autowired
-    private final UserMapper userMapper;
 
     public UserDto createUser(UserCreateDto userCreateDto) {
         if (userRepository.existsByEmail(userCreateDto.getEmail())) {
             throw new ConflictPropertyConstraintException(String.format("Email %s уже зарегистрирован ",
                     userCreateDto.getEmail()));
         }
-        final User user = userMapper.toUser(userCreateDto);
-        return userMapper.toUserDto(userRepository.save(user));
+        final User user = UserMapperCustom.toUser(userCreateDto);
+        return UserMapperCustom.toUserDto(userRepository.save(user));
     }
 
     public List<UserDto> getUsers(List<Long> ids, Integer from, Integer size) {
@@ -40,8 +36,8 @@ public class UserServiceImpl implements UserService {
         } else {
             users = userRepository.findAllByIdIn(ids, PageRequest.of(from > 0 ? from / size : 0, size)); /// нужна ли сортировка?
         }
-        return users.stream()
-                .map(userMapper::toUserDto)
+        return users.getContent().stream()
+                .map(UserMapperCustom::toUserDto)
                 .toList();
     }
 
@@ -51,16 +47,14 @@ public class UserServiceImpl implements UserService {
     }
 
     private void checkUserId(long id) {
-        Optional<User> userOptional = userRepository.findById(id);
-        if (userOptional.isEmpty()) {
-            throw new NotFoundException("Пользователь с id " + id + " не найден.");
-        }
+        userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден."));
     }
 
     @Override
     public UserShortDto getUserShortById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-        return userMapper.toUserShortDto(user);
+        return UserMapperCustom.toUserShortDto(user);
     }
 }
