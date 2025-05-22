@@ -10,9 +10,8 @@ import java.time.LocalDateTime;
 @Data
 public class ParticipationRequestDto {
     LocalDateTime created;
-    Long eventId;
-    boolean pinned;
+    Long event;
     Long id;
-    Long requesterId;
+    Long requester;
     Status status;
 }

@@ -21,7 +21,7 @@ public class NewEventDto {
     @NotBlank @Size(max = 255, message = "Annotation must not be longer 255 letters")
     String annotation;
     @NotNull
-    long categoryId;
+    long category;
     @NotBlank
     String description;
     @NotNull

@@ -22,12 +22,16 @@ public class Event {
     long id;
     @Column(columnDefinition = "TEXT")
     String annotation;
+    @Column(name = "category_id")
     @Transient
     long categoryId;
+    @Column(name = "confirmed_requests")
     @Transient
     long confirmedRequests;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "created_on")
     LocalDateTime createdOn;
+    @Column(columnDefinition = "TEXT")
     String description;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime eventDate;
@@ -37,8 +41,10 @@ public class Event {
     float location_lon;
     Boolean paid;
     long participantLimit;
+    @Column(name = "published_on")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime publishedOn;
+    @Column(name = "request_moderation")
     Boolean requestModeration;
     @Enumerated(EnumType.STRING)
     State state;

@@ -42,9 +42,9 @@ public class EventServiceImpl implements EventService {
             log.warn("Пользователь с id {} не найден", userId);
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
-        if (categoryRepository.findById(newEventDto.getCategoryId()).isEmpty()) {
-            log.warn("Категория с id {} не найдена", newEventDto.getCategoryId());
-            throw new NotFoundException("Категория с id " + newEventDto.getCategoryId() + " не найдена");
+        if (categoryRepository.findById(newEventDto.getCategory()).isEmpty()) {
+            log.warn("Категория с id {} не найдена", newEventDto.getCategory());
+            throw new NotFoundException("Категория с id " + newEventDto.getCategory() + " не найдена");
         }
         String uri = "/users/" + userId + "/events";
         log.info("Отправка статистики: ip={}, uri={}", ip, uri);
@@ -55,6 +55,7 @@ public class EventServiceImpl implements EventService {
                 .timestamp(LocalDateTime.now())
                 .build());
         Event event = eventDtoMapper.mapToModel(newEventDto, userId);
+        event.setCreatedOn(LocalDateTime.now());
         log.debug("Событие после маппинга: {}", event);
         Event savedEvent = eventRepository.save(event);
         log.info("Событие сохранено с ID {}", savedEvent.getId());

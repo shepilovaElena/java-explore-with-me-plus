@@ -21,7 +21,7 @@ public class EventDtoMapper {
         return Event.builder()
                 .initiatorId(userId)
                 .annotation(dto.getAnnotation())
-                .categoryId(dto.getCategoryId())
+                .categoryId(dto.getCategory())
                 .description(dto.getDescription())
                 .eventDate(dto.getEventDate())
                 .location_lat(dto.getLocation().getLat())

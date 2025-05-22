@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
@@ -20,6 +21,7 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping("/users/{userId}/events")
+    @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto saveEvent(@Valid @RequestBody NewEventDto newEventDto,
                                   @PathVariable(name = "userId") Long userId,
                                   HttpServletRequest request) {
