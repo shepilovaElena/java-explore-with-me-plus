@@ -91,7 +91,7 @@ public class EventController {
     }
 
     @GetMapping("/users/{userId}/events/{eventId}")
-    public EventShortDto getEventByUserIdAndEventId(@PathVariable Long userId,
+    public EventFullDto getEventByUserIdAndEventId(@PathVariable Long userId,
                                                           @PathVariable Long eventId,
                                                           HttpServletRequest request,
                                                           @RequestParam(required = false) Integer from,

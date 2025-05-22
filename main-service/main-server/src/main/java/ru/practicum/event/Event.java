@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.category.Category;
 import ru.practicum.dto.event.enums.State;
 
 import java.time.LocalDateTime;
@@ -22,9 +23,9 @@ public class Event {
     long id;
     @Column(columnDefinition = "TEXT")
     String annotation;
+
     @Column(name = "category_id")
-    @Transient
-    long categoryId;
+    Long category;
     @Column(name = "confirmed_requests")
     @Transient
     long confirmedRequests;

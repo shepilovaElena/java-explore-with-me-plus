@@ -20,7 +20,7 @@ public interface EventService {
 
     List<EventShortDto> getEventsByUserId(long userId, Integer from, Integer size, String ip);
 
-    EventShortDto getEventByUserIdAndEventId(long userId, long eventId,
+    EventFullDto getEventByUserIdAndEventId(long userId, long eventId,
                                                        Integer from, Integer size, String ip);
 
     EventFullDto updateEvent(UpdatedEventDto updatedEventDto,
