@@ -13,9 +13,9 @@ import ru.practicum.event.EventRepository;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.UserService;
 
-import java.util.List;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 public class CompilationServiceImpl implements CompilationService {
 
     private final CompilationRepository compilationRepository;
-    private final CompilationMapperCustom mapper;
     private final EventRepository eventRepository;
     private final UserService userService;
     private final CategoryService categoryService;
@@ -45,7 +44,7 @@ public class CompilationServiceImpl implements CompilationService {
         Compilation saved = compilationRepository.save(compilation);
         List<EventShortDto> eventDtos = mapToShortDtos(saved.getEvents());
 
-        return mapper.toDto(saved, eventDtos);
+        return CompilationMapperCustom.toDto(saved, eventDtos);
     }
 
     @Override
@@ -65,7 +64,7 @@ public class CompilationServiceImpl implements CompilationService {
         }
 
         Compilation updated = compilationRepository.save(compilation);
-        return mapper.toDto(updated, mapToShortDtos(updated.getEvents()));
+        return CompilationMapperCustom.toDto(updated, mapToShortDtos(updated.getEvents()));
     }
 
     @Override
@@ -84,7 +83,7 @@ public class CompilationServiceImpl implements CompilationService {
                 : compilationRepository.findAll(page).getContent();
 
         return comps.stream()
-                .map(comp -> mapper.toDto(comp, mapToShortDtos(comp.getEvents())))
+                .map(comp -> CompilationMapperCustom.toDto(comp, mapToShortDtos(comp.getEvents())))
                 .collect(Collectors.toList());
     }
 
@@ -92,7 +91,7 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto getById(Long compId) {
         Compilation comp = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Compilation not found"));
-        return mapper.toDto(comp, mapToShortDtos(comp.getEvents()));
+        return CompilationMapperCustom.toDto(comp, mapToShortDtos(comp.getEvents()));
     }
 
     private List<EventShortDto> mapToShortDtos(Collection<Event> events) {

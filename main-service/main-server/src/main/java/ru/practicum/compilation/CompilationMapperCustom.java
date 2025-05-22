@@ -11,7 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CompilationMapperCustom {
 
-    public CompilationDto toDto(Compilation compilation, List<EventShortDto> events) {
+    public static CompilationDto toDto(Compilation compilation, List<EventShortDto> events) {
         return CompilationDto.builder()
                 .id(compilation.getId())
                 .title(compilation.getTitle())
