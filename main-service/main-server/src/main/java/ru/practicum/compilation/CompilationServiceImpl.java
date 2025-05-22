@@ -41,6 +41,9 @@ public class CompilationServiceImpl implements CompilationService {
                 .events(events)
                 .build();
 
+        if (dto.getPinned() == null)
+            compilation.setPinned(false);
+
         Compilation saved = compilationRepository.save(compilation);
         List<EventShortDto> eventDtos = mapToShortDtos(saved.getEvents());
 

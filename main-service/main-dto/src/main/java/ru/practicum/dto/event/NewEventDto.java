@@ -1,10 +1,14 @@
 package ru.practicum.dto.event;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.dto.event.annotation.ValidEventDate;
 
 import java.time.LocalDateTime;
 
@@ -17,14 +21,16 @@ public class NewEventDto {
     @NotBlank
     String annotation;
     @NotNull
-    long categoryId;
+    long category;
     @NotBlank
     String description;
     @NotNull
+    @ValidEventDate
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime eventDate;
     @NotNull
     Location location;
+    @JsonSetter(nulls = Nulls.SKIP) // если поле null, то
     Boolean paid;
     int participantLimit;
     Boolean requestModeration;

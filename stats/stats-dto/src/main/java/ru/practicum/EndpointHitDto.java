@@ -21,7 +21,8 @@ public class EndpointHitDto {
     @NotBlank
     String uri;
     @NotBlank
-    @Pattern(regexp = "^\\d+\\.\\d+\\.\\d+\\.\\d+$", message = "Invalid IP format")
+    @Pattern(regexp = "^(?:(?:\\d{1,3}\\.){3}\\d{1,3}|(?:[\\da-fA-F]{0,4}:){2,7}[\\da-fA-F]{0,4})$",
+            message = "Invalid IP format")
     String ip;
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
