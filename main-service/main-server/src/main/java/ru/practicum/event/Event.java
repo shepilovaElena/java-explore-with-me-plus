@@ -43,7 +43,6 @@ public class Event {
     Boolean paid;
     @Column(name = "participant_limit")
     long participantLimit;
-    @Column(name = "published_on")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "published_on")
     LocalDateTime publishedOn;
