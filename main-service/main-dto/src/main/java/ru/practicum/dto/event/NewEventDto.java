@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NewEventDto {
-    @NotBlank @Size(max = 255, message = "Annotation must not be longer 255 letters")
+    @NotBlank
     String annotation;
     @NotNull
     long category;
@@ -31,7 +31,7 @@ public class NewEventDto {
     @NotNull
     Location location;
     @JsonSetter(nulls = Nulls.SKIP) // если поле null, то
-    Boolean paid = false; // по умолчанию false
+    Boolean paid;
     int participantLimit;
     Boolean requestModeration;
     @NotBlank

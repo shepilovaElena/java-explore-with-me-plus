@@ -56,6 +56,8 @@ public class EventServiceImpl implements EventService {
                 .build());
         Event event = eventDtoMapper.mapToModel(newEventDto, userId);
         event.setCreatedOn(LocalDateTime.now());
+        if (newEventDto.getPaid() == null)
+            event.setPaid(false);
         log.debug("Событие после маппинга: {}", event);
         Event savedEvent = eventRepository.save(event);
         log.info("Событие сохранено с ID {}", savedEvent.getId());

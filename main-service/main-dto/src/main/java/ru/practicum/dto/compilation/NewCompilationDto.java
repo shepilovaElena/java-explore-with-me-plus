@@ -3,6 +3,7 @@ package ru.practicum.dto.compilation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.util.Set;
 
@@ -11,13 +12,14 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class NewCompilationDto {
 
-    private Set<Long> events;
+    Set<Long> events;
 
-    private Boolean pinned = false;
+    Boolean pinned;
 
     @NotBlank
     @Size(min = 1, max = 255)
-    private String title;
+    String title;
 }
