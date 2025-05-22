@@ -59,6 +59,8 @@ public class EventServiceImpl implements EventService {
         if (newEventDto.getPaid() == null)
             event.setPaid(false);
         log.debug("Событие после маппинга: {}", event);
+        event.setCreatedOn(LocalDateTime.now());
+        event.setState(State.PENDING);
         Event savedEvent = eventRepository.save(event);
         log.info("Событие сохранено с ID {}", savedEvent.getId());
         EventFullDto dto = eventDtoMapper.mapToFullDto(savedEvent);
@@ -111,7 +113,6 @@ public class EventServiceImpl implements EventService {
 
         return eventDtoMapper.mapToFullDto(savedUpdatedEvent);
     }
-
 
     public EventFullDto updateAdminEvent(UpdatedEventDto updatedEvent,
                                          long eventId, String ip) {
@@ -251,6 +252,7 @@ public class EventServiceImpl implements EventService {
                 .uri(uri)
                 .timestamp(LocalDateTime.now())
                 .build());
+
 
         int safeFrom = (from != null) ? from : 0;
         int safeSize = (size != null) ? size : 10;

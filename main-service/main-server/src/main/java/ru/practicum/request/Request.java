@@ -3,7 +3,9 @@ package ru.practicum.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.dto.request.enums.Status;
 import ru.practicum.event.Event;
 import ru.practicum.user.User;
@@ -17,19 +19,22 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "event_id")
     Event event;
+
     @Enumerated(EnumType.STRING)
     Status status;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "requester_id")
     User requester;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime created;
 
+    LocalDateTime created;
 }

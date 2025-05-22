@@ -70,7 +70,9 @@ public class RequestServiceImpl implements RequestService {
                 .requester(user)
                 .status(status)
                 .event(event)
-                .created(LocalDateTime.now())
+                .created(LocalDateTime.now().withNano(
+                        (LocalDateTime.now().getNano() / 1_000_000) * 1_000_000
+                        ))
                 .build();
 
         return requestMapper.toParticipationRequestDto(requestRepository.save(request));
@@ -117,9 +119,9 @@ public class RequestServiceImpl implements RequestService {
         if (!invalidRequestByStatusIds.isEmpty())
             throw new ConflictPropertyConstraintException("Неверный статус у запросов c id " + invalidRequestByStatusIds);
 
-        if (httpRequest.getStatus().equals(Status.CANCELED)) {
+        if (httpRequest.getStatus().equals(Status.REJECTED)) {
             List<Request> cancelRequests = requests.stream()
-                    .peek(request -> request.setStatus(Status.CANCELED))
+                    .peek(request -> request.setStatus(Status.REJECTED))
                     .toList();
             requestRepository.saveAll(cancelRequests);
 
@@ -158,7 +160,7 @@ public class RequestServiceImpl implements RequestService {
         if (participantLimit - confirmedRequests == requestsSize) {
             List<Request> pendingRequests = requestRepository.findByEvent_IdAndStatus(eventId, Status.PENDING);
             List<Request> cancelRequests = pendingRequests.stream()
-                    .peek(request -> request.setStatus(Status.CANCELED))
+                    .peek(request -> request.setStatus(Status.REJECTED))
                     .toList();
             requestRepository.saveAll(cancelRequests);
 

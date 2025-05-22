@@ -25,11 +25,9 @@ public class EventController {
     public EventFullDto saveEvent(@Valid @RequestBody NewEventDto newEventDto,
                                   @PathVariable(name = "userId") Long userId,
                                   HttpServletRequest request) {
-
-        if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-            throw new InvalidEventTimeException(newEventDto.getEventDate());
-        } нужно перенести эту валидацию в dto
-
+//        if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
+//            throw new InvalidEventTimeException(newEventDto.getEventDate());
+//        }
         String ip = request.getRemoteAddr();
         log.info("Получен запрос на создание события от пользователя с ID {}, IP: {}", userId, ip);
         return eventService.saveEvent(newEventDto, userId, ip);
