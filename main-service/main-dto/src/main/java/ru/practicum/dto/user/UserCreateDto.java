@@ -16,9 +16,9 @@ import lombok.experimental.FieldDefaults;
 public class UserCreateDto {
     @NotBlank
     @Email
-    @Size(min = 6, max = 254, message = "от 6 до 254")
+    @Size(min = 6, max = 254, message = "email must be more than 6 but less than 254 characters.")
     String email;
     @NotBlank
-    @Size(min = 2, max = 250, message = "от 2 до 250")
+    @Size(min = 2, max = 250, message = "name must be more than 2 but less than 250 characters.")
     String name;
 }

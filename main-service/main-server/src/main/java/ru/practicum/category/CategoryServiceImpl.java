@@ -10,7 +10,8 @@ import ru.practicum.exception.NotFoundException;
 
 import java.util.List;
 
-import static ru.practicum.category.CategoryMapperCustom.*;
+import static ru.practicum.category.CategoryMapperCustom.toDto;
+import static ru.practicum.category.CategoryMapperCustom.toEntity;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +25,7 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ConflictException("Category with name already exists");
         }
         Category category = toEntity(dto);
-        return toDto(repository.save(category));
+        return CategoryMapperCustom.toDto(repository.save(category));
     }
 
     @Override
@@ -60,13 +61,13 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto getById(Long catId) {
         Category category = repository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
-        return toDto(category);
+        return CategoryMapperCustom.toDto(category);
     }
 
     @Override
     public CategoryDto getCategoryDtoById(Long id) {
         Category category = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
-        return toDto(category);
+        return CategoryMapperCustom.toDto(category);
     }
 }
