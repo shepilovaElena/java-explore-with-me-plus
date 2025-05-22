@@ -27,7 +27,6 @@ public class Event {
     @Column(name = "category_id")
     Long category;
     @Column(name = "confirmed_requests")
-    @Transient
     long confirmedRequests;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "created_on")

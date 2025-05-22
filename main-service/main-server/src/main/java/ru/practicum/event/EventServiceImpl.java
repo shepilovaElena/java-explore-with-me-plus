@@ -17,6 +17,7 @@ import ru.practicum.dto.event.enums.State;
 import ru.practicum.dto.event.enums.StateAction;
 import ru.practicum.exception.BadRequestException;
 import ru.practicum.exception.ConditionsNotMetException;
+import ru.practicum.exception.ConflictPropertyConstraintException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.UserRepository;
 
@@ -97,7 +98,7 @@ public class EventServiceImpl implements EventService {
         if (!event.getState().equals(State.CANCELED) && !event.getState().equals(State.PENDING)) {
             log.warn("Событие нельзя изменить. Состояние: {}, Модерация: {}",
                     event.getState(), event.getRequestModeration());
-            throw new ConditionsNotMetException(
+            throw new ConflictPropertyConstraintException(
                     "Изменить можно только отменённое событие или находящееся на модерации");
         }
 
@@ -143,23 +144,18 @@ public class EventServiceImpl implements EventService {
                     "Нельзя изменить событие, которое начинается в течение часа");
         }
 
-        System.out.println("updatedEvent.getStateAction()" + updatedEvent.getStateAction());
-        System.out.println("event.getRequestModeration()" + event.getRequestModeration());
 
+        if(event.getState().equals(State.PUBLISHED))
+            throw new ConflictPropertyConstraintException("Нельзя менять статус у уже опубликованного события");
+        if(event.getState().equals(State.CANCELED))
+            throw new ConflictPropertyConstraintException("Нельзя менять статус у уже отмененного события");
 
         if (updatedEvent.getStateAction() != null
                 && updatedEvent.getStateAction().equals(StateAction.PUBLISH_EVENT)
                 && !event.getState().equals(State.PENDING)) {
             log.warn("Попытка опубликовать событие без модерации. eventId={}", eventId);
-            throw new ConditionsNotMetException(
+            throw new ConflictPropertyConstraintException(
                     "Нельзя опубликовать событие, которое не находится в ожидании публикации");
-        }
-        if (updatedEvent.getStateAction() != null
-                && updatedEvent.getStateAction().equals(StateAction.REJECT_EVENT)
-                && event.getState().equals(State.PUBLISHED)) {
-            log.warn("Попытка отклонить уже опубликованное событие. eventId={}", eventId);
-            throw new ConditionsNotMetException(
-                    "Нельзя отклонить опубликованное событие");
         }
 
 
