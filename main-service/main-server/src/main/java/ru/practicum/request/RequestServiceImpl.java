@@ -57,7 +57,7 @@ public class RequestServiceImpl implements RequestService {
             throw new ConflictRelationsConstraintException("Нельзя участвовать в неопубликованном событии");
         }
 
-        if (event.getConfirmedRequests() == event.getParticipantLimit()) {
+        if (event.getConfirmedRequests() == event.getParticipantLimit() && event.getParticipantLimit() != 0) {
             throw new ConflictPropertyConstraintException("Достигнут лимит запросов на участие");
         }
 
@@ -100,7 +100,7 @@ public class RequestServiceImpl implements RequestService {
 
         List<Request> requests = requestRepository.findAllByIdIn(httpRequest.getRequestIds());
 
-        if (event.getConfirmedRequests() == event.getParticipantLimit())
+        if (event.getConfirmedRequests() == event.getParticipantLimit() && event.getParticipantLimit() != 0)
             throw new ConflictPropertyConstraintException("Достигнут лимит запросов на участие");
 
         List<Long> invalidRequestByEventIds = requests.stream()
