@@ -37,8 +37,10 @@ public class Event {
     LocalDateTime eventDate;
     @Column(name = "initiator_id")
     long initiatorId;
-    float location_lat;
-    float location_lon;
+    @Column(name = "location_lat")
+    float locationLat;
+    @Column(name = "location_lon")
+    float locationLon;
     Boolean paid;
     @Column(name = "participant_limit")
     long participantLimit;

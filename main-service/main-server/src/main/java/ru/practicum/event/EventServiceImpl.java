@@ -59,7 +59,7 @@ public class EventServiceImpl implements EventService {
         event.setCreatedOn(LocalDateTime.now());
         if (newEventDto.getPaid() == null)
             event.setPaid(false);
-        if(newEventDto.getRequestModeration() == null)
+        if (newEventDto.getRequestModeration() == null)
             event.setRequestModeration(true);
         log.debug("Событие после маппинга: {}", event);
         event.setCreatedOn(LocalDateTime.now());
@@ -145,9 +145,9 @@ public class EventServiceImpl implements EventService {
         }
 
 
-        if(event.getState().equals(State.PUBLISHED))
+        if (event.getState().equals(State.PUBLISHED))
             throw new ConflictPropertyConstraintException("Нельзя менять статус у уже опубликованного события");
-        if(event.getState().equals(State.CANCELED))
+        if (event.getState().equals(State.CANCELED))
             throw new ConflictPropertyConstraintException("Нельзя менять статус у уже отмененного события");
 
         if (updatedEvent.getStateAction() != null
@@ -330,7 +330,7 @@ public class EventServiceImpl implements EventService {
 
         Event event = eventOpt.get();
 
-        if(!event.getState().equals(State.PUBLISHED))
+        if (!event.getState().equals(State.PUBLISHED))
             throw new NotFoundException("Событие с id " + id + " не опубликовано");
 
 
@@ -358,8 +358,8 @@ public class EventServiceImpl implements EventService {
             event.setEventDate(dto.getEventDate());
         }
         if (dto.getLocation() != null) {
-            event.setLocation_lat(dto.getLocation().getLat());
-            event.setLocation_lon(dto.getLocation().getLon());
+            event.setLocationLat(dto.getLocation().getLat());
+            event.setLocationLon(dto.getLocation().getLon());
         }
         if (dto.getPaid() != null) {
             event.setPaid(dto.getPaid());
