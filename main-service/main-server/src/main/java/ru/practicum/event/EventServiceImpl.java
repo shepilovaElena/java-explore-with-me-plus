@@ -208,7 +208,9 @@ public class EventServiceImpl implements EventService {
 
         log.info("Финальный диапазон дат: start={}, end={}", start, end);
 
-        List<Long> allowedEventIds = categoryRepository.findEventIdsByCategoryIds(categories);
+        List<Long> allowedEventIds = eventRepository.findByCategoryIn(categories).stream()
+                .map(Event::getId)
+                .toList();
         log.info("События по категориям ({}): {}", categories, allowedEventIds);
 
         List<EventFullDto> events = eventRepository.getEvents(text, allowedEventIds, paid,
@@ -223,7 +225,7 @@ public class EventServiceImpl implements EventService {
                 .map(e -> {
                     String uriEvent = "events/" + e.getId();
                     List<ViewStatsDto> statsList = statsClient.getStats(
-                            LocalDateTime.MIN, LocalDateTime.now(), List.of(uriEvent), false);
+                            LocalDateTime.of(1900, 1, 1, 0, 0), LocalDateTime.now(), List.of(uriEvent), false);
                     long views = statsList.isEmpty() ? 0L : statsList.getFirst().getHits();
                     e.setViews(views);
                     return e;
@@ -272,7 +274,7 @@ public class EventServiceImpl implements EventService {
                 .map(e -> {
                     String uriEvent = "events/" + e.getId();
                     List<ViewStatsDto> statsList = statsClient.getStats(
-                            LocalDateTime.MIN, LocalDateTime.now(), List.of(uriEvent), false);
+                            LocalDateTime.of(1900, 1, 1, 0, 0), LocalDateTime.now(), List.of(uriEvent), false);
                     long views = statsList.isEmpty() ? 0L : statsList.getFirst().getHits();
                     e.setViews(views);
                     return e;
@@ -336,7 +338,7 @@ public class EventServiceImpl implements EventService {
         log.debug("Событие с id={} найдено", id);
         EventFullDto dto = eventDtoMapper.mapToFullDto(event);
         List<ViewStatsDto> statsList = statsClient.getStats(
-                LocalDateTime.of(2000, 1, 1, 0, 0), LocalDateTime.now(), List.of(uri), false);
+                LocalDateTime.of(1900, 1, 1, 0, 0), LocalDateTime.now(), List.of(uri), false);
         long views = statsList.isEmpty() ? 0L : statsList.get(0).getHits();
         dto.setViews(views);
 

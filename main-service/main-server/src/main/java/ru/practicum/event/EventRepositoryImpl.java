@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import ru.practicum.dto.event.enums.State;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -101,8 +102,8 @@ public class EventRepositoryImpl implements EventRepositoryCustom {
             p.add(cb.greaterThan(root.get("participantLimit"), 0));
         }
 
-        if (Boolean.FALSE.equals(isAdmin) || isAdmin == null) {
-            p.add(cb.isFalse(root.get("requestModeration")));
+        if (!Boolean.TRUE.equals(isAdmin)) {
+            p.add(cb.equal(root.get("state"), State.PUBLISHED));
         }
 
         if (allowedEventIds != null) {
