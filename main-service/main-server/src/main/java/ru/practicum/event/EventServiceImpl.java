@@ -50,7 +50,7 @@ public class EventServiceImpl implements EventService {
         String uri = "/users/" + userId + "/events";
         log.info("Отправка статистики: ip={}, uri={}", ip, uri);
         statsClient.saveHit(EndpointHitDto.builder()
-                .app("main-service")
+                .app("ewm-main-service")
                 .ip(ip)
                 .uri(uri)
                 .timestamp(LocalDateTime.now())
@@ -88,7 +88,7 @@ public class EventServiceImpl implements EventService {
 
         String uri = "/users/" + userId + "/events/" + eventId;
         statsClient.saveHit(EndpointHitDto.builder()
-                .app("main-service")
+                .app("ewm-main-service")
                 .ip(ip)
                 .uri(uri)
                 .timestamp(LocalDateTime.now())
@@ -130,7 +130,7 @@ public class EventServiceImpl implements EventService {
 
         String uri = "/admin/events/" + eventId;
         statsClient.saveHit(EndpointHitDto.builder()
-                .app("main-service")
+                .app("ewm-main-service")
                 .ip(ip)
                 .uri(uri)
                 .timestamp(LocalDateTime.now())
@@ -197,7 +197,7 @@ public class EventServiceImpl implements EventService {
         String uri = isAdmin ? "/admin/events" : "/events";
 
         statsClient.saveHit(EndpointHitDto.builder()
-                .app("main-service")
+                .app("ewm-main-service")
                 .ip(ip)
                 .uri(uri)
                 .timestamp(LocalDateTime.now())
@@ -254,7 +254,7 @@ public class EventServiceImpl implements EventService {
 
         String uri = "/users/" + userId + "/events";
         statsClient.saveHit(EndpointHitDto.builder()
-                .app("main-service")
+                .app("ewm-main-service")
                 .ip(ip)
                 .uri(uri)
                 .timestamp(LocalDateTime.now())
@@ -294,7 +294,7 @@ public class EventServiceImpl implements EventService {
 
         String uri = "/users/" + userId + "/events/" + eventId;
         statsClient.saveHit(EndpointHitDto.builder()
-                .app("main-service")
+                .app("ewm-main-service")
                 .ip(ip)
                 .uri(uri)
                 .timestamp(LocalDateTime.now())
@@ -316,7 +316,7 @@ public class EventServiceImpl implements EventService {
 
         String uri = "events/" + id;
         statsClient.saveHit(EndpointHitDto.builder()
-                .app("main-service")
+                .app("ewm-main-service")
                 .ip(ip)
                 .uri(uri)
                 .timestamp(LocalDateTime.now())
