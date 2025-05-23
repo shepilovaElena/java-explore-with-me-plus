@@ -28,10 +28,21 @@ public class StatsController {
     }
 
     @GetMapping("/stats")
-    public List<ViewStatsDto> getStats(@NotNull @RequestParam("start") LocalDateTime start,
-                                       @NotNull @RequestParam("end") LocalDateTime end,
-                                       @RequestParam(value = "uris", required = false) List<String> uris,
-                                       @RequestParam(value = "unique", defaultValue = "false") boolean unique) {
+    public List<ViewStatsDto> getStats(@NotNull
+                                       @RequestParam("start")
+                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                       LocalDateTime start,
+                                       @NotNull
+                                       @RequestParam("end")
+                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                       LocalDateTime end,
+                                       @RequestParam(value = "uris", required = false)
+                                       List<String> uris,
+                                       @RequestParam(value = "unique", defaultValue = "false")
+                                       boolean unique) throws Exception {
+        if (start.isAfter(end) || start.equals(end)) {
+            throw new Exception("The start must come before the end.");
+        }
         return service.getStats(start, end, uris, unique);
     }
 }
