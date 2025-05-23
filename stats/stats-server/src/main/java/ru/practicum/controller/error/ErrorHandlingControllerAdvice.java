@@ -6,12 +6,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @RestControllerAdvice
+@Slf4j
 public class ErrorHandlingControllerAdvice {
 
     @ExceptionHandler
@@ -26,12 +28,15 @@ public class ErrorHandlingControllerAdvice {
         errorList.addAll(e.getBindingResult().getGlobalErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .toList());
+
+        log.warn("Validation failed: {}", errorList);
         return new ErrorResponse(errorList);
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse onException(Exception e) {
+        log.error("Unhandled exception: ", e);
         List<String> errorList = new ArrayList<>();
         errorList.add(e.getMessage());
         return new ErrorResponse(errorList);
