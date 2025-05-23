@@ -25,6 +25,10 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+        if (uris != null && uris.isEmpty()) {
+            uris = null;
+        }
+
         List<ViewStatsDto> result = unique ?
                 repository.findUniqueHits(start, end, uris) :
                 repository.findAllHits(start, end, uris);
