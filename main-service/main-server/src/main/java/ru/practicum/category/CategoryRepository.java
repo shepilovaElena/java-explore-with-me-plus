@@ -14,7 +14,4 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     Optional<Category> findByName(String name);
 
     boolean existsByName(String name);
-
-    @Query(value = "SELECT event_id FROM events_categories WHERE category_id IN (:categoryIds)", nativeQuery = true)
-    List<Long> findEventIdsByCategoryIds(@Param("categoryIds") List<Long> categoryIds);
 }

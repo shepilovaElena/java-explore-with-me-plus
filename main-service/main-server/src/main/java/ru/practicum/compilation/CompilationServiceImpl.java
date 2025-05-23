@@ -108,7 +108,7 @@ public class CompilationServiceImpl implements CompilationService {
                         .confirmedRequests((int) event.getConfirmedRequests())
                         .views(event.getViews())
                         .initiator(userService.getUserShortById(event.getInitiatorId()))
-                        .category(categoryService.getCategoryDtoById(event.getCategoryId()))
+                        .category(categoryService.getCategoryDtoById(event.getCategory()))
                         .build())
                 .toList();
     }

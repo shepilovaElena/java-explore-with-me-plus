@@ -5,7 +5,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.category.CategoryDto;
 import ru.practicum.dto.category.NewCategoryDto;
+import ru.practicum.event.Event;
+import ru.practicum.event.EventRepository;
 import ru.practicum.exception.ConflictException;
+import ru.practicum.exception.ConflictPropertyConstraintException;
+import ru.practicum.exception.ConflictRelationsConstraintException;
 import ru.practicum.exception.NotFoundException;
 
 import java.util.List;
@@ -18,11 +22,12 @@ import static ru.practicum.category.CategoryMapperCustom.toEntity;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository repository;
+    private final EventRepository eventRepository;
 
     @Override
     public CategoryDto create(NewCategoryDto dto) {
         if (repository.existsByName(dto.getName())) {
-            throw new ConflictException("Category with name already exists");
+            throw new ConflictPropertyConstraintException("Category with name already exists");
         }
         Category category = toEntity(dto);
         return CategoryMapperCustom.toDto(repository.save(category));
@@ -33,9 +38,11 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = repository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
 
-        if (!category.getName().equals(dto.getName()) &&
-                repository.existsByName(dto.getName())) {
-            throw new ConflictException("Category with this name already exists");
+
+
+        if (!category.getName().equals(dto.getName())
+                && repository.existsByName(dto.getName())) {
+            throw new ConflictPropertyConstraintException("Category with this name already exists");
         }
 
         category.setName(dto.getName());
@@ -46,6 +53,8 @@ public class CategoryServiceImpl implements CategoryService {
     public void delete(Long catId) {
         Category category = repository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
+        if (!eventRepository.findAllByCategory(catId).isEmpty())
+            throw new ConflictRelationsConstraintException("У категории есть события");
         repository.delete(category);
     }
 

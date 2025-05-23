@@ -2,6 +2,8 @@ package ru.practicum.event;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -91,7 +93,7 @@ public class EventController {
     }
 
     @GetMapping("/users/{userId}/events/{eventId}")
-    public EventShortDto getEventByUserIdAndEventId(@PathVariable Long userId,
+    public EventFullDto getEventByUserIdAndEventId(@PathVariable Long userId,
                                                           @PathVariable Long eventId,
                                                           HttpServletRequest request,
                                                           @RequestParam(required = false) Integer from,
@@ -111,7 +113,7 @@ public class EventController {
             @RequestParam(required = false) String rangeEnd,
             @RequestParam(required = false) String sort,
             @RequestParam(defaultValue = "0") Integer from,
-            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "10") @Positive Integer size,
             HttpServletRequest request
     ) {
         String ip = request.getRemoteAddr();

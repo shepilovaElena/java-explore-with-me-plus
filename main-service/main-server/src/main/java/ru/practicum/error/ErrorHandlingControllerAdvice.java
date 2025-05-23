@@ -78,4 +78,11 @@ public class ErrorHandlingControllerAdvice {
     public ErrorResponse handleConditionsNotMetException(ConditionsNotMetException e) {
         return new ErrorResponse(HttpStatus.FORBIDDEN, "The publication condition has been violated.", e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBadRequestException(BadRequestException e) {
+        return new ErrorResponse(HttpStatus.BAD_REQUEST, "Request body could not be read properly", e.getMessage());
+    }
+
 }

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import ru.practicum.dto.event.enums.State;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class EventRepositoryImpl implements EventRepositoryCustom {
 
     @Override
     public Page<Event> getEvents(String text,
-                                 List<Long> allowedEventIds,
+                                 List<Long> categories,
                                  Boolean paid,
                                  LocalDateTime rangeStart,
                                  LocalDateTime rangeEnd,
@@ -37,7 +38,7 @@ public class EventRepositoryImpl implements EventRepositoryCustom {
         CriteriaQuery<Event> cq = cb.createQuery(Event.class);
         Root<Event> eventRoot = cq.from(Event.class);
         List<Predicate> selectPreds = buildPredicates(
-                cb, allowedEventIds,
+                cb, categories,
                 eventRoot, text, paid,
                 rangeStart, rangeEnd,
                 onlyAvailable, isAdmin
@@ -52,7 +53,7 @@ public class EventRepositoryImpl implements EventRepositoryCustom {
         CriteriaQuery<Long> countCq = cb.createQuery(Long.class);
         Root<Event> countRoot = countCq.from(Event.class);
         List<Predicate> countPreds = buildPredicates(
-                cb, allowedEventIds,
+                cb, categories,
                 countRoot, text, paid,
                 rangeStart, rangeEnd,
                 onlyAvailable, isAdmin
@@ -66,7 +67,7 @@ public class EventRepositoryImpl implements EventRepositoryCustom {
     }
 
     private List<Predicate> buildPredicates(CriteriaBuilder cb,
-                                            List<Long> allowedEventIds,
+                                            List<Long> categories,
                                             Root<Event> root,
                                             String text,
                                             Boolean paid,
@@ -101,12 +102,12 @@ public class EventRepositoryImpl implements EventRepositoryCustom {
             p.add(cb.greaterThan(root.get("participantLimit"), 0));
         }
 
-        if (Boolean.FALSE.equals(isAdmin) || isAdmin == null) {
-            p.add(cb.isFalse(root.get("requestModeration")));
+        if (!Boolean.TRUE.equals(isAdmin)) {
+            p.add(cb.equal(root.get("state"), State.PUBLISHED));
         }
 
-        if (allowedEventIds != null) {
-            p.add(root.get("id").in(allowedEventIds));
+        if (categories != null) {
+            p.add(root.get("category").in(categories));
         }
 
         return p;
