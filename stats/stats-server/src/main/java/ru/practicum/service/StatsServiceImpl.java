@@ -22,15 +22,15 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public void saveHit(EndpointHitDto dto) {
-        log.debug("Saving hit: {}", dto);
+        log.info("Saving hit: {}", dto);
         EndpointHit hit = EndpointHitMapperCustom.toModel(dto);
         repository.save(hit);
-        log.debug("Hit saved successfully.");
+        log.info("Hit saved successfully.");
     }
 
     @Override
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        log.debug("Fetching stats: start={}, end={}, uris={}, unique={}", start, end, uris, unique);
+        log.info("Fetching stats: start={}, end={}, uris={}, unique={}", start, end, uris, unique);
 
         if(start.isAfter(end))
             throw new BadRequestException("Дата начала не может быть позже даты окончания");
@@ -43,7 +43,7 @@ public class StatsServiceImpl implements StatsService {
                 repository.findUniqueHits(start, end, uris) :
                 repository.findAllHits(start, end, uris);
 
-        log.debug("Stats result count: {}", result.size());
+        log.info("Stats result count: {}", result.size());
         result.forEach(stat -> log.trace("Stat record: {}", stat));
 
         return result;
