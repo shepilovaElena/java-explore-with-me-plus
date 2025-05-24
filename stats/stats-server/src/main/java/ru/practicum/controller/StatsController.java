@@ -38,7 +38,6 @@ public class StatsController {
         log.info("GET /stats - Params: start={}, end={}, uris={}, unique={}", start, end, uris, unique);
         List<ViewStatsDto> stats = service.getStats(start, end, uris, unique);
         log.info("Stats retrieved: {} records", stats.size());
-        log.info(stats.toString());
         return stats;
     }
 }
