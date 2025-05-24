@@ -39,12 +39,6 @@ public class StatsServiceImpl implements StatsService {
             uris = null;
         }
 
-        if (uris != null) {
-            uris = uris.stream()
-                    .map(uri -> uri.startsWith("/") ? uri : "/" + uri)
-                    .toList();
-        }
-
         List<ViewStatsDto> result = unique ?
                 repository.findUniqueHits(start, end, uris) :
                 repository.findAllHits(start, end, uris);
