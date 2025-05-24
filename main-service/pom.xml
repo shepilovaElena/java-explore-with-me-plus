@@ -15,7 +15,6 @@
     </parent>
 
     <modules>
-        <module>main-client</module>
         <module>main-dto</module>
         <module>main-server</module>
     </modules>
