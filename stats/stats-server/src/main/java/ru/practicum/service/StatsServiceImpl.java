@@ -5,13 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.EndpointHitDto;
 import ru.practicum.ViewStatsDto;
-import ru.practicum.controller.error.NotFoundException;
+import ru.practicum.controller.error.BadRequestException;
 import ru.practicum.mapper.EndpointHitMapperCustom;
 import ru.practicum.model.EndpointHit;
 import ru.practicum.repository.StatsRepository;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -34,7 +33,7 @@ public class StatsServiceImpl implements StatsService {
         log.debug("Fetching stats: start={}, end={}, uris={}, unique={}", start, end, uris, unique);
 
         if(start.isAfter(end))
-            throw new NotFoundException("Дата начала не может быть позже даты окончания");
+            throw new BadRequestException("Дата начала не может быть позже даты окончания");
 
         if (uris != null && uris.isEmpty()) {
             uris = null;

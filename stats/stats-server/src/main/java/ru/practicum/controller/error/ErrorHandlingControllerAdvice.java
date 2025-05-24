@@ -43,8 +43,8 @@ public class ErrorHandlingControllerAdvice {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse onNotFoundException(NotFoundException e) {
-        return new ErrorResponse(HttpStatus.NOT_FOUND,"The required object was not found.");
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse onNotFoundException(BadRequestException e) {
+        return new ErrorResponse(HttpStatus.BAD_REQUEST,"The required object was not found.");
     }
 }
