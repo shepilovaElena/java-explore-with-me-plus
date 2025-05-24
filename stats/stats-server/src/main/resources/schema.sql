@@ -4,5 +4,5 @@ CREATE TABLE IF NOT EXISTS hits
     app VARCHAR(32) NOT NULL,
     uri VARCHAR(128) NOT NULL,
     ip  VARCHAR(45) NOT NULL,
-    timepoint timestamp  without time zone NOT NULL
+    timestamp TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
