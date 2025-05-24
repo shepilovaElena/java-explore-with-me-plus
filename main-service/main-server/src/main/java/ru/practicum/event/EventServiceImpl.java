@@ -226,7 +226,7 @@ public class EventServiceImpl implements EventService {
 
         List<EventFullDto> eventsWithViews = events.stream()
                 .map(e -> {
-                    String uriEvent = "events/" + e.getId();
+                    String uriEvent = "/events/" + e.getId();
                     List<ViewStatsDto> statsList = statsClient.getStats(
                             LocalDateTime.of(1900, 1, 1, 0, 0), LocalDateTime.now(), List.of(uriEvent), false);
                     long views = statsList.isEmpty() ? 0L : statsList.getFirst().getHits();
@@ -271,7 +271,7 @@ public class EventServiceImpl implements EventService {
 
         return userEvents.stream()
                 .map(e -> {
-                    String uriEvent = "events/" + e.getId();
+                    String uriEvent = "/events/" + e.getId();
                     List<ViewStatsDto> statsList = statsClient.getStats(
                             LocalDateTime.of(1900, 1, 1, 0, 0), LocalDateTime.now(), List.of(uriEvent), false);
                     long views = statsList.isEmpty() ? 0L : statsList.getFirst().getHits();
@@ -314,7 +314,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto getEventById(long id, String ip) {
         log.debug("Получен запрос на получение события с id={} от ip={}", id, ip);
 
-        String uri = "events/" + id;
+        String uri = "/events/" + id;
         statsClient.saveHit(EndpointHitDto.builder()
                 .app("ewm-main-service")
                 .ip(ip)
