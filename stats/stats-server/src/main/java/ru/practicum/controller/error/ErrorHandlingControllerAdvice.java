@@ -30,7 +30,7 @@ public class ErrorHandlingControllerAdvice {
                 .toList());
 
         log.warn("Validation failed: {}", errorList);
-        return new ErrorResponse(errorList);
+        return new ErrorResponse(HttpStatus.BAD_REQUEST, errorList);
     }
 
     @ExceptionHandler
@@ -39,6 +39,12 @@ public class ErrorHandlingControllerAdvice {
         log.error("Unhandled exception: ", e);
         List<String> errorList = new ArrayList<>();
         errorList.add(e.getMessage());
-        return new ErrorResponse(errorList);
+        return new ErrorResponse(HttpStatus.BAD_REQUEST, errorList);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse onNotFoundException(NotFoundException e) {
+        return new ErrorResponse(HttpStatus.NOT_FOUND,"The required object was not found.");
     }
 }
