@@ -11,7 +11,7 @@ import ru.practicum.user.User;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Requests")
+@Table(name = "requests")
 @Getter
 @Setter
 @NoArgsConstructor
