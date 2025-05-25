@@ -340,8 +340,8 @@ public class EventServiceImpl implements EventService {
             event.setEventDate(dto.getEventDate());
         }
         if (dto.getLocation() != null) {
-            event.setLocation_lat(dto.getLocation().getLat());
-            event.setLocation_lon(dto.getLocation().getLon());
+            event.setLocationLat(dto.getLocation().getLat());
+            event.setLocationLon(dto.getLocation().getLon());
         }
         if (dto.getPaid() != null) {
             event.setPaid(dto.getPaid());
