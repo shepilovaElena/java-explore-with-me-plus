@@ -52,8 +52,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDto update(Long compId, UpdateCompilationRequest dto) {
-        Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundException("Compilation not found"));
+        Compilation compilation = checkAndGetCompilationById(compId);
 
         if (dto.getTitle() != null) {
             compilation.setTitle(dto.getTitle());
@@ -72,9 +71,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public void delete(Long compId) {
-        if (!compilationRepository.existsById(compId)) {
-            throw new NotFoundException("Compilation not found");
-        }
+        checkAndGetCompilationById(compId);
         compilationRepository.deleteById(compId);
     }
 
@@ -92,25 +89,29 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDto getById(Long compId) {
-        Compilation comp = compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundException("Compilation not found"));
+        Compilation comp = checkAndGetCompilationById(compId);
         return CompilationMapperCustom.toDto(comp, mapToShortDtos(comp.getEvents()));
     }
 
     private List<EventShortDto> mapToShortDtos(Collection<Event> events) {
         return events.stream()
                 .map(event -> EventShortDto.builder()
-                        .id((int) event.getId()) // уже Long
+                        .id(event.getId()) // уже Long
                         .annotation(event.getAnnotation())
                         .title(event.getTitle())
                         .eventDate(event.getEventDate())
                         .paid(event.getPaid())
-                        .confirmedRequests((int) event.getConfirmedRequests())
+                        .confirmedRequests(event.getConfirmedRequests())
                         .views(event.getViews())
                         .initiator(userService.getUserShortById(event.getInitiatorId()))
-                        .category(categoryService.getCategoryDtoById(event.getCategory()))
+                        .category(categoryService.getById(event.getCategory()))
                         .build())
                 .toList();
+    }
+
+    private Compilation checkAndGetCompilationById(long compId) {
+        return compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Compilation with id " + compId + " not found"));
     }
 
 }

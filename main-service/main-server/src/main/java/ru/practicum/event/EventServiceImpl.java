@@ -39,15 +39,12 @@ public class EventServiceImpl implements EventService {
 
     public EventFullDto saveEvent(NewEventDto newEventDto, long userId, String ip) {
         log.debug("Попытка сохранить новое событие: {}", newEventDto);
-        if (userRepository.findById(userId).isEmpty()) {
-            log.warn("Пользователь с id {} не найден", userId);
-            throw new NotFoundException("Пользователь с id " + userId + " не найден");
-        }
-        if (categoryRepository.findById(newEventDto.getCategory()).isEmpty()) {
-            log.warn("Категория с id {} не найдена", newEventDto.getCategory());
-            throw new NotFoundException("Категория с id " + newEventDto.getCategory() + " не найдена");
-        }
+
+        checkUserId(userId);
+        checkCategoryId(newEventDto.getCategory());
+
         String uri = "/users/" + userId + "/events";
+
         log.info("Отправка статистики: ip={}, uri={}", ip, uri);
         statsClient.saveHit(EndpointHitDto.builder()
                 .app("ewm-main-service")
@@ -57,6 +54,7 @@ public class EventServiceImpl implements EventService {
                 .build());
         Event event = eventDtoMapper.mapToModel(newEventDto, userId);
         event.setCreatedOn(LocalDateTime.now());
+
         if (newEventDto.getPaid() == null)
             event.setPaid(false);
         if (newEventDto.getRequestModeration() == null)
@@ -75,16 +73,9 @@ public class EventServiceImpl implements EventService {
                                     long userId, long eventId, String ip) {
         log.info("Попытка обновить событие. userId={}, eventId={}, ip={}", userId, eventId, ip);
 
-        if (userRepository.findById(userId).isEmpty()) {
-            log.warn("Пользователь с id {} не найден", userId);
-            throw new NotFoundException("Пользователь с id " + userId + " не найден");
-        }
+        checkUserId(userId);
 
-        Optional<Event> eventOpt = eventRepository.findById(eventId);
-        if (eventOpt.isEmpty()) {
-            log.warn("Событие с id {} не найдено", eventId);
-            throw new NotFoundException("Событие с id " + eventId + " не найдено");
-        }
+       Event event = checkAndGetEventById(eventId);
 
         String uri = "/users/" + userId + "/events/" + eventId;
         statsClient.saveHit(EndpointHitDto.builder()
@@ -94,7 +85,6 @@ public class EventServiceImpl implements EventService {
                 .timestamp(LocalDateTime.now())
                 .build());
 
-        Event event = eventOpt.get();
         if (!event.getState().equals(State.CANCELED) && !event.getState().equals(State.PENDING)) {
             log.warn("Событие нельзя изменить. Состояние: {}, Модерация: {}",
                     event.getState(), event.getRequestModeration());
@@ -120,13 +110,8 @@ public class EventServiceImpl implements EventService {
     public EventFullDto updateAdminEvent(UpdatedEventDto updatedEvent,
                                          long eventId, String ip) {
         log.info("Админ запрашивает обновление события. eventId={}, ip={}", eventId, ip);
-        Optional<Event> eventOpt = eventRepository.findById(eventId);
-        if (eventOpt.isEmpty()) {
-            log.warn("Событие с id {} не найдено", eventId);
-            throw new NotFoundException("Событие с id " + eventId + " не найдено");
-        }
 
-
+        Event event = checkAndGetEventById(eventId);
 
         String uri = "/admin/events/" + eventId;
         statsClient.saveHit(EndpointHitDto.builder()
@@ -136,8 +121,6 @@ public class EventServiceImpl implements EventService {
                 .timestamp(LocalDateTime.now())
                 .build());
 
-        Event event = eventOpt.get();
-
         if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
             log.warn("Событие начинается в течение часа: {}", event.getEventDate());
             throw new ConditionsNotMetException(
@@ -145,7 +128,7 @@ public class EventServiceImpl implements EventService {
         }
 
 
-        if (event.getState().equals(State.PUBLISHED))
+        if(event.getState().equals(State.PUBLISHED))
             throw new ConflictPropertyConstraintException("Нельзя менять статус у уже опубликованного события");
         if (event.getState().equals(State.CANCELED))
             throw new ConflictPropertyConstraintException("Нельзя менять статус у уже отмененного события");
@@ -157,7 +140,6 @@ public class EventServiceImpl implements EventService {
             throw new ConflictPropertyConstraintException(
                     "Нельзя опубликовать событие, которое не находится в ожидании публикации");
         }
-
 
         log.info("Применение обновлений админом к событию id={}", eventId);
         applyUpdate(event, updatedEvent);
@@ -346,7 +328,7 @@ public class EventServiceImpl implements EventService {
     }
 
 
-    public void applyUpdate(Event event, UpdatedEventDto dto) {
+    private void applyUpdate(Event event, UpdatedEventDto dto) {
         log.info("Начат процесс обновления события, просматриваются поля на изменения");
         if (dto.getAnnotation() != null) {
             event.setAnnotation(dto.getAnnotation());
@@ -358,8 +340,8 @@ public class EventServiceImpl implements EventService {
             event.setEventDate(dto.getEventDate());
         }
         if (dto.getLocation() != null) {
-            event.setLocationLat(dto.getLocation().getLat());
-            event.setLocationLon(dto.getLocation().getLon());
+            event.setLocation_lat(dto.getLocation().getLat());
+            event.setLocation_lon(dto.getLocation().getLon());
         }
         if (dto.getPaid() != null) {
             event.setPaid(dto.getPaid());
@@ -388,5 +370,28 @@ public class EventServiceImpl implements EventService {
             }
         }
         log.info("Событие обновлено");
+    }
+
+    private void checkUserId(long userId) {
+        if (userRepository.findById(userId).isEmpty()) {
+            log.warn("Пользователь с id {} не найден", userId);
+            throw new NotFoundException("Пользователь с id " + userId + " не найден");
+        }
+    }
+
+    private void checkCategoryId(long catId) {
+        if (categoryRepository.findById(catId).isEmpty()) {
+            log.warn("Категория с id {} не найдена", catId);
+            throw new NotFoundException("Категория с id " + catId + " не найдена");
+        }
+    }
+
+    private Event checkAndGetEventById(long eventId) {
+        Optional<Event> eventOpt = eventRepository.findById(eventId);
+        if (eventOpt.isEmpty()) {
+            log.warn("Событие с id {} не найдено", eventId);
+            throw new NotFoundException("Событие с id " + eventId + " не найдено");
+        }
+        return eventOpt.get();
     }
 }

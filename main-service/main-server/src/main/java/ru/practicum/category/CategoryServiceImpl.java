@@ -24,8 +24,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto create(NewCategoryDto dto) {
-        if (repository.existsByName(dto.getName())) {
-            throw new ConflictPropertyConstraintException("Category with name already exists");
+        String categoryName = dto.getName();
+        if (repository.existsByName(categoryName)) {
+            throw new ConflictPropertyConstraintException("Category with name " + categoryName + " already exists");
         }
         Category category = toEntity(dto);
         return CategoryMapperCustom.toDto(repository.save(category));
@@ -33,14 +34,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto update(Long catId, NewCategoryDto dto) {
-        Category category = repository.findById(catId)
-                .orElseThrow(() -> new NotFoundException("Category not found"));
-
-
-
-        if (!category.getName().equals(dto.getName())
-                && repository.existsByName(dto.getName())) {
-            throw new ConflictPropertyConstraintException("Category with this name already exists");
+        Category category = checkAndGetCategoryById(catId);
+        String categoryName = dto.getName();
+        if (!category.getName().equals(categoryName)
+                && repository.existsByName(categoryName)) {
+            throw new ConflictPropertyConstraintException("Category with this name " + categoryName + " already exists");
         }
 
         category.setName(dto.getName());
@@ -66,15 +64,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto getById(Long catId) {
-        Category category = repository.findById(catId)
-                .orElseThrow(() -> new NotFoundException("Category not found"));
+        Category category = checkAndGetCategoryById(catId);
         return CategoryMapperCustom.toDto(category);
     }
 
-    @Override
-    public CategoryDto getCategoryDtoById(Long id) {
-        Category category = repository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Category not found"));
-        return CategoryMapperCustom.toDto(category);
+    private Category  checkAndGetCategoryById(long catId) {
+        return repository.findById(catId)
+                .orElseThrow(() -> new NotFoundException("Category with id = " + catId + " not found"));
     }
 }
