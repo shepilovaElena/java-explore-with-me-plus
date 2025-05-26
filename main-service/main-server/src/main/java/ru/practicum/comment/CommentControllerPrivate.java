@@ -15,13 +15,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentControllerPrivate {
 
-
+    private final CommentService commentService;
 
     @PostMapping("/users/{userId}/comment")
     @ResponseStatus(HttpStatus.CREATED)
     public CommentDto createComment(@PathVariable Long userId,
                                     @RequestParam Long eventId,
                                     @Valid @RequestBody NewCommentDto newCommentDto) {
+
+        return commentService.createComment(userId, eventId, newCommentDto);
 
     }
 
@@ -31,6 +33,8 @@ public class CommentControllerPrivate {
                                     @PathVariable Long commentId,
                                     @Valid @RequestBody UpdateCommentDto updateCommentDto) {
 
+        return commentService.updateComment(userId, commentId, updateCommentDto);
+
     }
 
     @DeleteMapping("/users/{userId}/comment/{commentId}")
@@ -38,21 +42,19 @@ public class CommentControllerPrivate {
     public void deleteComment(@PathVariable Long userId,
                               @PathVariable Long commentId) {
 
-    }
-
-
-    @GetMapping("/users/{userId}/comment/{commentId}")
-    @ResponseStatus(HttpStatus.OK)
-    public CommentDto getCommentByID(@PathVariable Long userId,
-                              @PathVariable Long commentId) {
+        commentService.deleteCommentByUser(userId, commentId);
 
     }
 
     @GetMapping("/users/{userId}/comment")
     @ResponseStatus(HttpStatus.OK)
-    public List<CommentDto> getCommentByUserId(@PathVariable Long userId) {
+    public List<CommentDto> getCommentsByUserId(@PathVariable Long userId) {
+
+        return commentService.getCommentsByUserId(userId);
 
     }
+
+
 
 
 
