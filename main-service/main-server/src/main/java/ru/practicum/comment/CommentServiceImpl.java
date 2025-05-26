@@ -1,5 +1,6 @@
 package ru.practicum.comment;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.comment.CommentDto;
@@ -80,6 +81,7 @@ public class CommentServiceImpl implements CommentService {
                 .toList();
     }
 
+    @Transactional
     @Override
     public void deleteCommentsByAdmin(DeleteCommentsDto deleteCommentsDto) {
         List<Long> commentListIds = commentRepository.findByIdIn(deleteCommentsDto.getCommentsIds()).stream()

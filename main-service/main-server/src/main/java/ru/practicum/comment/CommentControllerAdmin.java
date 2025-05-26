@@ -12,7 +12,7 @@ public class CommentControllerAdmin {
 
     private final CommentService commentService;
 
-    @DeleteMapping("/admin/comments}")
+    @DeleteMapping("/admin/comments")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCommentsByAdmin(@Valid @RequestBody DeleteCommentsDto deleteCommentsDto) {
         commentService.deleteCommentsByAdmin(deleteCommentsDto);
