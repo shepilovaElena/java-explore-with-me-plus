@@ -1,5 +1,6 @@
 package ru.practicum.comment;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -12,8 +13,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comments")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -35,5 +35,6 @@ public class Comment {
     Event event;
 
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime created;
 }

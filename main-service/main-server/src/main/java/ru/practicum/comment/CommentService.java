@@ -1,6 +1,7 @@
 package ru.practicum.comment;
 
 
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.dto.comment.DeleteCommentsDto;
 import ru.practicum.dto.comment.NewCommentDto;
@@ -21,5 +22,8 @@ public interface CommentService {
     List<CommentDto> getCommentsByUserId(Long userId);
 
     void deleteCommentsByAdmin(DeleteCommentsDto deleteCommentsDto);
+
+    List<CommentDto> getComments(String content, Long userId, Long eventId,
+                                 String rangeStart, String rangeEnd, Integer from, Integer size);
 
 }

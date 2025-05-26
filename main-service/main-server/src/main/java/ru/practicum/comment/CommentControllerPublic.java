@@ -2,11 +2,10 @@ package ru.practicum.comment;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.comment.CommentDto;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -14,7 +13,17 @@ public class CommentControllerPublic {
 
     private final CommentService commentService;
 
-    //findComments
+    @GetMapping("/comment")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CommentDto> getComments(@RequestParam(required = false) String content,
+                                        @RequestParam(required = false) Long userId,
+                                        @RequestParam(required = false) Long eventId,
+                                        @RequestParam(required = false) String rangeStart,
+                                        @RequestParam(required = false) String rangeEnd,
+                                        @RequestParam(required = false) Integer from,
+                                        @RequestParam(required = false) Integer size) {
+        return commentService.getComments(content, userId, eventId, rangeStart, rangeEnd, from, size);
+    }
 
     @GetMapping("/comment/{commentId}")
     @ResponseStatus(HttpStatus.OK)
