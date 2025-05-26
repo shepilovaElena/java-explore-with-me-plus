@@ -2,6 +2,7 @@ package ru.practicum.comment;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.dto.comment.DeleteCommentsDto;
@@ -10,12 +11,14 @@ import ru.practicum.dto.comment.UpdateCommentDto;
 import ru.practicum.dto.event.enums.State;
 import ru.practicum.event.Event;
 import ru.practicum.event.EventRepository;
+import ru.practicum.exception.BadRequestException;
 import ru.practicum.exception.ConflictRelationsConstraintException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.User;
 import ru.practicum.user.UserRepository;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -45,7 +48,7 @@ public class CommentServiceImpl implements CommentService {
                 .user(user)
                 .build();
 
-        return  commentMapper.commentDtoToComment(commentRepository.save(comment));
+        return  commentMapper.commentToDto(commentRepository.save(comment));
     }
 
 
@@ -56,7 +59,7 @@ public class CommentServiceImpl implements CommentService {
 
         comment.setContent(updateCommentDto.getContent());
 
-        return commentMapper.commentDtoToComment(commentRepository.save(comment));
+        return commentMapper.commentToDto(commentRepository.save(comment));
 
     }
 
@@ -68,8 +71,42 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public List<CommentDto> getComments(String content, Long userId, Long eventId,
+                                        String rangeStart, String rangeEnd, Integer from, Integer size) {
+        User user = null; Event event = null;
+        if (userId != null) user = getUser(userId);
+        if (eventId != null) event = getEvent(eventId);;
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        if (rangeStart == null || rangeStart.isBlank()) {
+            rangeStart = LocalDateTime.MIN.format(formatter);
+        }
+
+        LocalDateTime start = LocalDateTime.parse(rangeStart, formatter);
+        LocalDateTime end = null;
+
+        if (rangeEnd == null || rangeEnd.isBlank()) {
+            rangeEnd = LocalDateTime.now().format(formatter);
+        }
+        end = LocalDateTime.parse(rangeEnd, formatter);
+        if (start.isAfter(end)) {
+            throw new BadRequestException("В диапазоне времени поиска начало не может быть позже конца");
+        }
+
+        int safeFrom = (from != null) ? from : 0;
+        int safeSize = (size == null ? 100 : size);
+        PageRequest page = PageRequest.of(safeFrom / safeSize, safeSize);
+
+        return commentRepository.getComments(content, userId, eventId,
+                        rangeStart, rangeEnd, from, size, page)
+                .stream()
+                .map(commentMapper::commentToDto)
+                .toList();
+    }
+
+    @Override
     public CommentDto getCommentById(Long commentId) {
-        return commentMapper.commentDtoToComment(getComment(commentId));
+        return commentMapper.commentToDto(getComment(commentId));
     }
 
     @Override
@@ -77,7 +114,7 @@ public class CommentServiceImpl implements CommentService {
         getUser(userId);
         List<Comment> commentsList = commentRepository.findByUserId(userId);
         return commentsList.stream()
-                .map(commentMapper::commentDtoToComment)
+                .map(commentMapper::commentToDto)
                 .toList();
     }
 

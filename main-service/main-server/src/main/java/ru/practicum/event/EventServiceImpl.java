@@ -169,7 +169,7 @@ public class EventServiceImpl implements EventService {
         if (rangeEnd != null && !rangeEnd.isBlank()) {
             end = LocalDateTime.parse(rangeEnd, formatter);
             if (start.isAfter(end)) {
-                throw new BadRequestException("Время начала события не может быть позже даты окончания");
+                throw new BadRequestException("В диапазоне времени поиска начало не может быть позже конца");
             }
         }
 
