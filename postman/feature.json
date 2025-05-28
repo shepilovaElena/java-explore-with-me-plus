@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "e20d4183-81e7-404a-a0c5-6183b9ce3032",
-		"name": "Test Explore With Me - Comments.V4",
+		"name": "feature",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "40129654"
 	},
@@ -1288,16 +1288,14 @@
 			"value": ""
 		},
 		{
-			"key": "test_comment_id2",
-			"value": ""
-		},
-		{
 			"key": "commentSources",
-			"value": ""
+			"value": "",
+			"type": "string"
 		},
 		{
 			"key": "content",
-			"value": ""
+			"value": "",
+			"type": "string"
 		}
 	]
 }
