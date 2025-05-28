@@ -725,8 +725,8 @@
 							"        const actualComment = actualMap[expectedComment.id];",
 							"        pm.expect(actualComment, `Комментарий с ID ${expectedComment.id} должен присутствовать`).to.exist;",
 							"        pm.expect(actualComment.content).to.eql(expectedComment.content, `Содержание комментария с ID ${expectedComment.id} должно совпадать`);",
-							"        pm.expect(actualComment.user || actualComment.user).to.eql(expectedComment.user, `user комментария с ID ${expectedComment.id} должен совпадать`);",
-							"        pm.expect(actualComment.event || actualComment.event.to.eql(expectedComment.event, `event комментария с ID ${expectedComment.id} должен совпадать`);",
+							"        pm.expect(actualComment.user).to.eql(expectedComment.user, `userId комментария с ID ${expectedComment.id} должен совпадать`);",
+							"        pm.expect(actualComment.event).to.eql(expectedComment.event, `eventId комментария с ID ${expectedComment.id} должен совпадать`);",
 							"    });",
 							"});"
 						],
