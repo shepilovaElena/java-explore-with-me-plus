@@ -77,9 +77,9 @@ public class CommentServiceImpl implements CommentService {
         if (userId != null) user = getUser(userId);
         if (eventId != null) event = getEvent(eventId);;
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
         if (rangeStart == null || rangeStart.isBlank()) {
-            rangeStart = LocalDateTime.MIN.format(formatter);
+            rangeStart = LocalDateTime.of(1900, 1, 1, 1, 1).format(formatter);
         }
 
         LocalDateTime start = LocalDateTime.parse(rangeStart, formatter);
@@ -98,7 +98,7 @@ public class CommentServiceImpl implements CommentService {
         PageRequest page = PageRequest.of(safeFrom / safeSize, safeSize);
 
         return commentRepository.getComments(content, userId, eventId,
-                        rangeStart, rangeEnd, from, size, page)
+                        start, end, from, size, page)
                 .stream()
                 .map(commentMapper::commentToDto)
                 .toList();

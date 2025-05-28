@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 
     @Override
     public Page<Comment> getComments(String content, Long userId, Long eventId,
-                                     String rangeStart, String rangeEnd, Integer from, Integer size,
+                                     LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size,
                                      Pageable pageable) {
 
         CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -59,7 +60,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
     private List<Predicate> buildPredicates(CriteriaBuilder cb,
                                             Root<Comment> root,
                                             String content, Long userId, Long eventId,
-                                            String rangeStart, String rangeEnd) {
+                                            LocalDateTime rangeStart, LocalDateTime rangeEnd) {
 
         List<Predicate> p = new ArrayList<>();
 
