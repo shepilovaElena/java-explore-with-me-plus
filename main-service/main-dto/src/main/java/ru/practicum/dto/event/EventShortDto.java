@@ -1,11 +1,12 @@
-package ru.practicum.dto;
+package ru.practicum.dto.event;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.dto.category.CategoryDto;
+import ru.practicum.dto.user.UserShortDto;
 
 import java.time.LocalDateTime;
 
@@ -14,16 +15,22 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-public class EndpointHitDto {
+public class EventShortDto {
     @NotBlank
-    String app;
-    @NotBlank
-    String uri;
-    @NotBlank
-    @Pattern(regexp = "^\\d+\\.\\d+\\.\\d+\\.\\d+$", message = "Invalid IP format")
-    String ip;
+    String annotation;
+    @NotNull
+    CategoryDto category;
+    long confirmedRequests;
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime timestamp;
+    @NotNull
+    LocalDateTime eventDate;
+    long id;
+    @NotNull
+    UserShortDto initiator;
+    @NotNull
+    Boolean paid;
+    @NotBlank
+    String title;
+    Long views;
 }

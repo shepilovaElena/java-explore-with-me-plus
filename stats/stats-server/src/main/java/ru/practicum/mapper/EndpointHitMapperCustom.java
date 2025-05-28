@@ -1,23 +1,24 @@
 package ru.practicum.mapper;
 
-import ru.practicum.dto.EndpointHitDto;
+import ru.practicum.EndpointHitDto;
 import ru.practicum.model.EndpointHit;
 
 public class EndpointHitMapperCustom {
-    public static EndpointHit toModel(EndpointHitDto endpointHitDto) {
+    public static EndpointHit toModel(EndpointHitDto dto) {
         return EndpointHit.builder()
-                .ip(endpointHitDto.getIp())
-                .uri(endpointHitDto.getUri())
-                .app(endpointHitDto.getApp())
-                .timepoint(endpointHitDto.getTimestamp())
+                .ip(dto.getIp())
+                .uri(dto.getUri())
+                .app(dto.getApp())
+                .timestamp(dto.getTimestamp())
                 .build();
     }
 
-    public static EndpointHitDto toDto(EndpointHit endpointHit) {
+    public static EndpointHitDto toDto(EndpointHit entity) {
         return EndpointHitDto.builder()
-                .ip(endpointHit.getIp())
-                .uri(endpointHit.getUri())
-                .app(endpointHit.getApp())
-                .timestamp(endpointHit.getTimepoint()).build();
+                .ip(entity.getIp())
+                .uri(entity.getUri())
+                .app(entity.getApp())
+                .timestamp(entity.getTimestamp())
+                .build();
     }
 }
